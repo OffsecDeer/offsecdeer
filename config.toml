@@ -7,7 +7,7 @@ paginate = 3
 theme = "hugo-dusk"
 
 googleAnalytics = ""
-disqusShortname = ""
+disqusShortname = "offsecdeer"
 
 [author]
   name = "Giulio Pierantoni"
