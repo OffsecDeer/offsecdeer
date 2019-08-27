@@ -7,10 +7,10 @@ paginate = 3
 theme = "hugo-dusk"
 
 googleAnalytics = ""
-disqusShortname = ""
 
 [author]
   name = "Giulio Pierantoni"
+  disqusShortname = ""
 
 SectionPagesMenu = "main"
 
