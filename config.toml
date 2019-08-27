@@ -7,10 +7,10 @@ paginate = 3
 theme = "hugo-dusk"
 
 googleAnalytics = ""
+disqusShortname = "offsecdeer"
 
 [author]
   name = "Giulio Pierantoni"
-  disqusShortname = ""
 
 SectionPagesMenu = "main"
 
@@ -52,12 +52,6 @@ pygmentsCodeFences = true
 [params.meta]
   keywords = "blog, tech, hacking, pentesting, ctf, htb, hackthebox, offsec"
   description = "Thoughts and notes on offensive security from a hacking enthusiast of a deer"
-
-[params]
-  github = "OffsecDeer"
-  gitlab = "OffsecDeer"
-  twitter = "twitter id"
-  email = "toninformatica88@gmail.com"
 
 [params.colors]
   # hugo-dusk colors
