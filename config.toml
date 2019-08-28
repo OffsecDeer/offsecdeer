@@ -1,4 +1,4 @@
-baseurl = "https://offsecdeer.gitlab.io"
+baseurl = "https://offsecdeer.gitlab.io/"
 title = "Offsec Deer"
 copyright = "Copyright (c) 2019, all rights reserved."
 canonifyurls = true
