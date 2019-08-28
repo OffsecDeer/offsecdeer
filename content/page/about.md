@@ -1,11 +1,8 @@
 ---
 title: About me
-subtitle: Who I am and what you will see in my blog
 comments: false
+page: true
 ---
-
-![baud_avatar](/images/baud.gif)
-
 ## Who am I?
 My name is Giulio Pierantoni, my online alias is often Baud, when available. I am just a guy who likes to explore computers and anything that has to do with them, especially in the field of offensive security, which I have been studying on my own for some time, and in this blog it's pretty much all I'll be talking about with a few exceptions.
 

@@ -1,7 +1,7 @@
 ---
 title: Contact me
-subtitle: Where to find me
 comments: false
+page: true
 ---
 
 If you want to get in touch with me please use one of these contacts:

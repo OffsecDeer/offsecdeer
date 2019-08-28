@@ -5,9 +5,12 @@ tags:
   - hackthebox
   - ctf
   - writeup
+showdate: true
+toc: true
 ---
-
+{{%summary%}}
 ![img](/images/october-writeup/1.png)
+{{%/summary%}}
 
 October is a Linux box with a difficulty rating from the HTB staff of 4.9 / 10, however the ratings from the members for getting user and root are the total opposites:
 
@@ -110,8 +113,10 @@ It's normal behavior is to... well.. do nothing. It asks for a string as argumen
 
 Alright let's load it up on gdb, and with the help of the PEDA.py plugin we can analyze it a little more in detail. In particular we are interested in knowing where exactly the crash happens, so we generate a never-repeating string with our good old pattern tools (or alternatively the *pattern* command from PEDA.py can also be used):
 
-    /usr/share/metasploit-framework/tools/exploit/pattern_create.rb
-    /usr/share/metasploit-framework/tools/exploit/pattern_offset.rb
+```shell-session
+/usr/share/metasploit-framework/tools/exploit/pattern_create.rb
+/usr/share/metasploit-framework/tools/exploit/pattern_offset.rb
+```
 
 ![img](/images/october-writeup/22.png)
 
@@ -133,28 +138,37 @@ As I said before we are going to follow the bruteforce way, running the program 
 
 So now we know that:
 
-    libc_address = 0xb75e8000
+```shell-session
+libc_address = 0xb75e8000
+```
 
 Now we need to know where the system function is located within libc, and we can find its offset address thanks to objdump:
 
-    objdump -TC /lib/i386-linux-gnu/libc.so.6 | grep " system$"
+```shell-session
+objdump -TC /lib/i386-linux-gnu/libc.so.6 | grep " system$"
+```
 
 ![img](/images/october-writeup/27.png)
 
 0x00040310 is the offset from the base address of libc where system will be loaded, so in order to obtain the absolute address we must add the two:
 
-    system_address = 0xb75e8000 + 0x00040310 = 0xb7628310
+```shell-session
+system_address = 0xb75e8000 + 0x00040310 = 0xb7628310
+```
 
 Only thing left to obtain is the address of the "/bin/sh" string, which the strings command can find for us:
 
-    strings -t x /lib/i386-linux-gnu/libc.so.6 | grep /bin/sh
+```shell-session
+strings -t x /lib/i386-linux-gnu/libc.so.6 | grep /bin/sh
+```
 
 ![img](/images/october-writeup/28.png)
 
 And again this is just an offset, so for the full address we make another addition:
 
-    string_address = 0xb75e8000 + 0x00162bac = 0xb774abac
-
+```shell-session
+string_address = 0xb75e8000 + 0x00162bac = 0xb774abac
+```
 ---
 
 ## Writing the exploit: putting it all together

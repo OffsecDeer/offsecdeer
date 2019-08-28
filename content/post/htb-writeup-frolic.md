@@ -5,9 +5,12 @@ tags:
   - hackthebox
   - ctf
   - writeup
+showdate: true
+toc: true
 ---
-
+{{%summary%}}
 ![img](/images/frolic-writeup/1.png)
+{{%/summary%}}
 
 Despite this box being rated as “Easy” it’s one of those challenges that can easily become frustrating because of rabbit holes, weird messages, and overall not-so-realistic aspects that can be downright confusing, but after all this we get to exploit a very fun and sort of realistic buffer overflow vulnerability through a ret2libc attack that allows us to leverage our permissions and become root on the system, so I’d say it’s a great box to learn new things regarding exploit writing and it can also teach a few tricks that can be used on other CTF-y and less realistic boxes, so all experience is good.
 
@@ -19,7 +22,9 @@ I’m also going to explain some theory regarding the buffer overflow attack we 
 
 When I first approach a new box I like to scan every possible port with masscan and then pass the results to nmap to enumerate the discovered services more deeply, but in this case a standard nmap scan returns all the results we need so let’s not overcomplicate things from the start, here is the command I typically use:
 
-    nmap -sS -sV -sC 10.10.10.111
+```shell-session
+nmap -sS -sV -sC 10.10.10.111
+```
 
 If you’re not familiar with nmap flags:
 
@@ -33,7 +38,9 @@ The output reveals some interesting ports:
 
 We have SSH, SMB, and even an nginx web server running on port 9999, which is very unusual. If we wanted we could list available SMB shares with smbclient like this:
 
-    smbclient -L 10.10.10.111
+```shell-session
+smbclient -L 10.10.10.111
+```
 
 But we would only see default shares that cannot be accessed with a NULL session, so we have to look elsewhere. What about that suspicious looking nginx server? What is it hiding?
 
@@ -41,7 +48,9 @@ But we would only see default shares that cannot be accessed with a NULL session
 
 Well… nothing apparently, the source code doesn’t even contain comments or links to useful resources, this looks like a normal default configuration of nginx. But it isn’t just that, not even in the slightest. We can find out why by firing up our favorite web content discovery tool, I use dirb with the default common.txt dictionary it comes with, it works well for most occasions:
 
-    dirb http://10.10.10.111:9999/ -R
+```shell-session
+dirb http://10.10.10.111:9999/ -R
+```
 
 By default dirb will scan content recursively, so whenever it finds a new folder it will start iterating through the entire dictionary inside the new folder in the hope of finding more files or sub-directories, but this can result in some very noisy and useless output we don’t need, for example when a directory containing a manual in multiple languages is found, so the -R flag tells dirb to ask us if we want to enter a new directory and start a new scan, this way we can only make it scan the directories we are interested in and not waste any time. Anyway it turns out the server is actually hiding something:
 
@@ -58,7 +67,7 @@ I’m going to start from the bottom. The /test/ directory just takes us to a ph
 
 In fact password.txt and user.txt (no, it’s not the flag) are actual files inside this /backup/ folder, which we can open to reveal a pair of credentials:
 
-```
+```shell-session
 user - admin
 password - imnothuman
 ```
@@ -109,7 +118,7 @@ function validate()
 
 The script itself gave us the credentials we need to login!
 
-```
+```shell-session
 User: admin
 Pass: superduperlooperpassword_lol
 ```
@@ -120,7 +129,9 @@ So let’s see what we find behind this admin “portal”: we are redirected to
 
 Looks pretty weird, and definitely not humanly readable. This is probably the worst part of the entire challenge because what we have here is the source code of a program written in a dialect of an uncommon esoteric programming language (and by "dialect" I mean "shorter version of the language"). Esoteric languages are not created to be used efficiently, rather they try to be as unique, confusing, or weird as possible, mostly just for a laugh. This one in particular is called Ook! and luckily we can find an [online interpreter](https://www.dcode.fr/ook-language) where to paste the source code and get its output:
 
-    Nothing here check /asdiSIAJJ0QWE9JAS
+```shell-session
+Nothing here check /asdiSIAJJ0QWE9JAS
+```
 
 We decide to listen to that suggestion and we go to 10.10.10.111:9999/asdiSIAJJ0QWE9JAS where in fact we find something:
 
@@ -136,7 +147,9 @@ In the first step I opened nano, a CLI text editor, and pasted the Base64 string
 
 Fear not though, the issue really is tiny for a reason… the password is just “password”, it’s easily guessable. But because we are discussing password protected Zip archives I’m still going to show a [neat tool](https://github.com/hyc/fcrackzip) to launch a dictionary attack against archives that may have a somewhat less stupid password. Example usage:
 
-    fcrackzip -D -p ../rockyou.txt -u frolic_out
+```shell-session
+fcrackzip -D -p ../rockyou.txt -u frolic_out
+```
 
 Anyway now that we can unzip the file we can see the content of index.php, the only file we could find in the archive, which in reality is just a normal text file disguising itself as a PHP page:
 
@@ -144,11 +157,13 @@ Anyway now that we can unzip the file we can see the content of index.php, the o
 
 That is clearly a hexadecimal string, when we run into these strings the way to make them readable is almost every time to convert them into ASCII, as we can guess this was just a normal string of which every character has been rewritten as its hexadecimal value. A random online converter like this 6 will do the job. This is what we get:
 
-    KysrKysgKysrKysgWy0+KysgKysrKysgKysrPF0gPisrKysgKy4tLS0gLS0uKysgKysrKysgLjwrKysgWy0+KysgKzxdPisKKysuPCsgKytbLT4gLS0tPF0gPi0tLS0gLS0uLS0gLS0tLS0gLjwrKysgK1stPisgKysrPF0gPisrKy4gPCsrK1sgLT4tLS0KPF0+LS0gLjwrKysgWy0+KysgKzxdPisgLi0tLS4gPCsrK1sgLT4tLS0gPF0+LS0gLS0tLS4gPCsrKysgWy0+KysgKys8XT4KKysuLjwgCg==
+```shell-session
+KysrKysgKysrKysgWy0+KysgKysrKysgKysrPF0gPisrKysgKy4tLS0gLS0uKysgKysrKysgLjwrKysgWy0+KysgKzxdPisKKysuPCsgKytbLT4gLS0tPF0gPi0tLS0gLS0uLS0gLS0tLS0gLjwrKysgK1stPisgKysrPF0gPisrKy4gPCsrK1sgLT4tLS0KPF0+LS0gLjwrKysgWy0+KysgKzxdPisgLi0tLS4gPCsrK1sgLT4tLS0gPF0+LS0gLS0tLS4gPCsrKysgWy0+KysgKys8XT4KKysuLjwgCg==
+```
 
 Oh look, another Base64 string! Will we ever get anywhere with this? Decode this one too:
 
-```
+```shell-session
 +++++ +++++ [->++ +++++ +++<] >++++ +.--- --.++ +++++ .<+++ [->++ +<]>+
 ++.<+ ++[-> ---<] >---- --.-- ----- .<+++ +[->+ +++<] >+++. <+++[ ->---
 <]>-- .<+++ [->++ +<]>+ .---. <+++[ ->--- <]>-- ----. <++++ [->++ ++<]>
@@ -157,7 +172,9 @@ Oh look, another Base64 string! Will we ever get anywhere with this? Decode this
 
 And this looks a little more cryptic. If you’ve already dug deep enough in the realm of esoteric programming languages you might have recognized this already, it’s a BrainFuck program. So just like with Ook! we can look for an online interpreter 5 where to paste and execute this code, which gives us as output:
 
-    idkwhatispass
+```shell-session
+idkwhatispass
+```
 
 So we went through all this trouble only for a string that we don’t know where to use and what it represents. Well to be fair it’s pretty easy to guess it could be a password, so we’ll go with that. But where can we use it? It still doesn’t work on SSH, so we’re still missing something. But not really, we just left it behind for later. Remember that /dev/ folder, the one that we couldn’t access because of the Forbidden HTTP message? We didn’t try running a dirb scan in there, I wonder if we can find something…
 
@@ -165,7 +182,9 @@ So we went through all this trouble only for a string that we don’t know where
 
 We did find indeed. The file called “test” is literally just a text file with “test” written on it, nothing interesting. However that /backup/ folder…
 
-    /playsms
+```shell-session
+/playsms
+```
 
 We are presented with this, a name for another folder. So if we connect to http://10.10.10.111:9999/playsms:
 
@@ -243,35 +262,49 @@ Alright, that’s enough theory for now. Let’s go back to work. We know what a
 
 The address stays the same! Good, let’s write it down for later:
 
-    libc_base_address = 0xb7e19000
+```shell-session
+libc_base_address = 0xb7e19000
+```
 
 This is the address where the code of libc begins in memory when our program is being executed. Because it’s part of our binary’s address space we are authorized to access it anytime. Next we should find the specific address of the system() function: this task would be very easy if gdb was installed on Frolic, however we don’t have it at hand, but there are still other ways to find the addresses we need. I’m going to do it by using objdump:
 
-    objdump -TC /lib/i386-linux-gnu/libc.so.6 | grep " system$"
+```shell-session
+objdump -TC /lib/i386-linux-gnu/libc.so.6 | grep " system$"
+```
 
 This command will output the offset where system() is located inside libc (I got the path of the library from the output of ldd above), so it’s not an absolute memory address, in order to know where system() will be loaded during runtime we need to add the offset to the base address we found above:
 
 ![img](/images/frolic-writeup/27.png)
 
-    system_address = libc_base_address + system_offset = 0xb7e19000 + 0x0003ada0 = 0xb7e53da0
+```shell-session
+system_address = libc_base_address + system_offset = 0xb7e19000 + 0x0003ada0 = 0xb7e53da0
+```
 
 Great, we have the address that will be loaded inside the EIP register to redirect execution! However system() needs an important parameter to work, which is the path of the program to be called. Since we want to spawn a shell the call to system() must look like this:
 
-    system("/bin/sh")
+```shell-session
+system("/bin/sh")
+```
 
 The x86 calling convention says that function parameters must be passed on the stack, and when the parameter is a string a pointer to the string must be pushed on the stack instead, so we must find a pointer to the “/bin/sh” string to set on the stack so that system() will take it as parameter and execute it. This time we can do it with the “strings” command, by looking for the offset of that string inside the libc library our rop binary uses on the box:
 
-    strings -a -t x /lib/i386-linux-gnu/libc.so.6 | grep '/bin/sh'
+```shell-session
+strings -a -t x /lib/i386-linux-gnu/libc.so.6 | grep '/bin/sh'
+```
 
 ![img](/images/frolic-writeup/28.png)
 
 And there we go, we have found another offset. Like before we can calculate where the string will be loaded at runtime with a simple addition:
 
-    string_address = libc_base_address + string_offset = 0xb7e19000 + 0x0015ba0b = 0xb7f74a0b
+```shell-session
+string_address = libc_base_address + string_offset = 0xb7e19000 + 0x0015ba0b = 0xb7f74a0b
+```
 
 The last memory address we need to write our exploit is a fake return address, because we are trying to emulate a proper call to a new function and the calling convention states we must provide a return address that will be used to pick up execution once the function we are trying to call exits. This isn’t something we should worry about though, it can be 4 bytes of junk, they will cause the program to crash when we close our shell but they won’t have any effect for as long as we are running it, so it doesn’t matter:
 
-    exit_address = 0xaabbccdd
+```shell-session
+exit_address = 0xaabbccdd
+```
 
 There, now we have all the addresses we need. We’re only missing one important piece: where the hell is the return address we want overwrite? Of course we need to know where it is in order to change its value, so let’s get to it, I’m going to use GDB + Peda.py and this will make it very fast. The way to do it is very simple, first we generate a very long pattern of characters which never repeat, then we feed the program with that pattern and we observe which characters overwrite the EIP register, those will be the characters that overwrote the return address, so if we get the offset of those characters from the full pattern we will know exactly how many bytes of data we need to reach the return address. Peda already has a built-in command to generate such patterns, so I’m going to load the rop binary on GDB, generate a pattern, give it as input to the program, and see what happens:
 
@@ -322,7 +355,9 @@ print buffer
 
 If you’re wondering what all those struct.pack functions do they convert the hexadecimal addresses we give them into little endian ("<I") arrays of bytes because we are dealing with a x86 CPU, so the little endian notation must be used. Also notice that I obtained the memory addresses of system() and of “/bin/sh” from my Kali box as well so I could test the exploit locally before uploading it, if you want to do that too you should remember to disable ASLR because it’s enabled by default on modern kernels, to do that run this command:
 
-    echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
+```bash
+echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
+```
 
 ASLR will be re-enabled automatically as soon as the system is rebooted, or you can just echo 2 instead of 0 into the same file when you’re done messing with the exploit. Let’s test it now and see if our Python script works:
 
@@ -349,6 +384,7 @@ And the system got owned! A quick summary of these last few actions I performed:
 I thought this was a really fun box, especially the privilege escalation part because I love software exploitation and I wish there were more boxes on HTB that required it. Although maybe I would have given 30 points for this, not just 20. I hope you enjoyed this writeup.
 
 
+This post was originall published on [0x00sec](https://0x00sec.org/t/hackthebox-writeup-frolic/12478).
 
 
 

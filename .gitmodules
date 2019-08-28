@@ -1,3 +1,6 @@
 [submodule "themes/hugo-dusk"]
 	path = themes/hugo-dusk
 	url = https://github.com/gyorb/hugo-dusk
+[submodule "themes/deer"]
+	path = themes/deer
+	url = https://github.com/OffsecDeer/Deer

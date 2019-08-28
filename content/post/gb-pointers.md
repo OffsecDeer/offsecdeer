@@ -4,6 +4,8 @@ date: 2019-08-24T17:37:49+02:00
 tags:
   - rom-hacking
   - gameboy
+showdate: true
+toc: true
 ---
 
 This topic has already been covered multiple times on many different websites by different people, but because I want the series of ROM hacking posts on my blog to be somewhat complete and being able to link back to some theory posts would be useful for more advanced topic I'll be talking about in the future, I decided to make my own post on how pointers are used in GameBoy games, why they are so important, and how the repointing process works, as it's a matter that I've seen creating quite some confusion among new hackers.
@@ -33,8 +35,10 @@ The reason why they are so important and we are interested in changing these poi
 
 ROMs of GameBoy games are divided into many different sections called *ROM banks*, each bank is 0x4000 bytes big (0x = [hexadecimal notation](https://en.wikipedia.org/wiki/Hexadecimal)) and the GameBoy's Zilog80 CPU cannot access data located in two different banks at the same time, it needs to do a *bank switch* first, and at that point the old bank will be inaccessible until the CPU switches back to it. We need to know this because usually the game will never use all those 0x4000 bytes in each bank, game programmers used to save data of different kinds on different banks instead of cramming all of it into contiguous spaces, which means we may find scripts in bank 1, maps in bank 2, graphics in bank 3, sounds and music in bank 4, and so on, but of course different developers adopted different strategies. This means that banks were rarely completely full, in fact, if we take a look at any GameBoy game with a hex editor we'll find that at the end of many banks there will be a lot of empty room filled with zeros. To verify this, pick a random memory address from any game and use this simple formula:
 
-    bankBaseAddress = (offset / 0x4000) * 0x4000
-    
+```shell-session
+bankBaseAddress = (offset / 0x4000) * 0x4000
+```
+
 This calculates the beginning in memory of the desired bank. The division tells us what bank number we are in, and multiplying by 0x4000 gives us the right address of where the bank begins. Do the calculation with a random address picked from any game, jump to it with your hex editor of choice, and take a look at the addresses right *before* where you landed:
 
 ![img](/images/gb-pointers/2.png)
@@ -51,11 +55,15 @@ Keep in mind though, not every bank has that much free space in it, for example,
 
 Luckily for us pointers follow a very specific structure and so it's relatively easy to find where the pointer pointing at a memory address of our interest is located, we cannot calculate their memory address but we can calculate their content, and knowing that pointers are usually located in tables we know a pointer will be adjacent to many others which will look pretty similar, and if the game we are hacking has a [ROM map](https://datacrystal.romhacking.net/wiki/ROM_map) available we can look up the desired pointers there.
 
-    pointer = (offset % 0x4000) + 0x4000
-    
+```shell-session
+pointer = (offset % 0x4000) + 0x4000
+```
+
 The result will always be two bytes long. Because the GameBoy works in [little endian](https://en.wikipedia.org/wiki/Endianness) we must swap the two bytes. For example:
 
-    pointer = (0xD0DF % 0x4000) + 0x4000 = 0x50DF ---> 0x50 0xDF ---> 0xDF 0x50 ---> 0xDF50
+```shell-session
+pointer = (0xD0DF % 0x4000) + 0x4000 = 0x50DF ---> 0x50 0xDF ---> 0xDF 0x50 ---> 0xDF50
+```
 
 *offset* is the memory address of our choice, and the result of this operation (% = mod) returns us the value the pointer we're looking for is holding. We can now consult our ROM map of choice to see where the table we're interested in is located, it will give us the base address of the table, so where the first element is located. Navigate to that address and look for the values that were obtained. In my example I got that memory address from the wild Pokèmon data in route 1 on Pokèmon Blue, so from the ROM map of the game I found that the Wild Pokèmon data pointers start at 0xCEEB, and sure enough, just a few bytes ahead:
 
@@ -63,7 +71,9 @@ The result will always be two bytes long. Because the GameBoy works in [little e
 
 The red square is address 0xCEEB, beginning of the pointer table, which starts with a bunch of filler values until the first actual entry is met, at address 0xCF03. Good, now we have identified the pointer we must work with, now we must calculate the right value to overwrite it with in order to make it point to our new data. Remember that the data must be in the same ROM bank as the pointer, unless it's a 3 bytes pointer, which I'll explain later, but those are rarer. To calculate said value we can use the same formula above but with the new address we want to repoint to instead, so if for example I added some data at address 0xE002 I would do:
 
-    newPointer = (0xE002 % 0x4000) + 0x4000 = 0x6002 ---> 0x60 0x02 ---> 0x02 0x60 ---> 0x0260
+```shell-session
+newPointer = (0xE002 % 0x4000) + 0x4000 = 0x6002 ---> 0x60 0x02 ---> 0x02 0x60 ---> 0x0260
+```
 
 So I'll have to change DF50 into 0260, and that will tell the game to look for the data in the new location where we added it instead of the old one, which can always be re-used if needed.
 
@@ -73,8 +83,10 @@ So I'll have to change DF50 into 0260, and that will tell the game to look for t
 
 A set of cartridges for the GameBoy and GameBoy Color have inside an interesting integrated circuit called [Memory Bank Controller](http://gbdev.gg8.se/wiki/articles/Memory_Bank_Controllers) (MBC), it's a chip that allowed programmers to have access to more than 32 Kbytes of space (the default storage available in a GB cartridge) in the cartridge by performing bank switching, effectively giving them the ability to gather data from any bank they wanted regardless of where the code was being executed at that moment. 3 bytes pointers are structured this way:
 
-    [B] [A] [BANK_NUMBER]
-    
+```shell-session
+[B] [A] [BANK_NUMBER]
+```
+
 It's the same as a two bytes pointer but with an extra byte telling the game in what bank the desired data is located, so at the end of the day nothing really changes, if anything these pointers give us a lot more flexibility because we can repoint them everywhere we want in the ROM, as long as we set the BANK_NUMBER byte properly. Note that BANK_NUMBER *isn't* always located right next to the pointer itself, sometimes it can be a few bytes ahead, consult the ROM maps. If in doubt and if you know what data these pointers are pointing at try calculating the data's bank number and look for that number near the area of the pointers.
 
 ---
@@ -83,12 +95,16 @@ It's the same as a two bytes pointer but with an extra byte telling the game in 
 
 If you need to calculate the memory address pointed to by a pointer you have already identified there is another formula that can be used:
 
-    dataAddress = (bankNumber * 0x4000) + (pointer - 0x4000)
-	
+```shell-session
+dataAddress = (bankNumber * 0x4000) + (pointer - 0x4000)
+```
+
 This returns an absolute offset to the data pointed at by the pointer, it works with both kinds, 2 and 3 bytes. Remember that when doing this calculation *pointer* must be switched back to big endian if you're reading its data straight from a hex editor. The bank number can be calculated with a simple division:
 
-    bankNumber = address / 0x4000
-    
+```shell-session
+bankNumber = address / 0x4000
+```
+
 ---
 
 I think this is enough theory for now. It's more for curious people since there are many pointer calculators nowadays and those make everything a bit easier, but for those who wanted to know how it works behind the scenes, here you have it. I have written my own calculator in C# so if you want to give it a look go ahead, but it's very basic.

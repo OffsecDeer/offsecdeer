@@ -5,9 +5,12 @@ tags:
   - hackthebox
   - ctf
   - writeup
+showdate: true
+toc: true
 ---
-
+{{%summary%}}
 ![img](/images/granny-writeup/1.png)
+{{%/summary%}}
 
 Granny is one of the easiest challenges on HackTheBox, it runs a very old version of Windows and this makes it vulnerable to many exploits, all of which are easy to run. When they were first released Granny and Grandpa were two good boxes to experiment with pivoting, however because of the new system implemented for virtual labs by the HackTheBox team this is no longer possible, as far as I'm aware. So I will only describe the standard steps to take to root the boxes individually, Grandpa will be covered in [the next post](/post/htb-writeup-grandpa/).
 
@@ -21,7 +24,7 @@ As usual we begin with a quick look at the services running on the box with nmap
 
 IIS 6.0 is running on port 80 and nothing else apparently, this very old version of IIS was being shipped by default on Windows Server 2003 so we can assume that's the OS we are dealing with. Also, WebDAV is enabled on IIS so we can try using [davtest](https://github.com/cldrn/davtest) to see if we can exploit some common WebDAV misconfigurations such as arbitrary file upload:
 
-```
+```shell-session
 $ davtest -url http://10.10.10.15
 ```
 
@@ -33,7 +36,7 @@ Many tests came out as positive, apparently we can use the PUT HTTP method to up
 
 However one method which can be tried is uploading a .txt file with the PUT method, and then rename it with the MOVE method to give it the .asp extension later, bypassing the extension filter. We must check the availability of the MOVE method first though, davtest can do so with the -move flag:
 
-```
+```shell-session
 ┌──[baud@parrot]─[~/granny]
 └──╼ $davtest -url http://10.10.10.15 -move
 ********************************************************
@@ -110,14 +113,14 @@ The MOVE method is supported, the trick works. We can take advantage of this usi
 
 A Meterpreter session was successfully spawned, but I get access denied at every command I try to run:
 
-```
+```shell-session
 meterpreter > getuid
 [-] stdapi_sys_config_getuid: Operation failed: Access is denied.
 ```
 
 I got this issue with Grandpa too and it makes the whole privilege escalation phase impossible if this little issue isn't solved first. Fixing it is actually very simple, we just have to migrate to a different process owned by our current user, I don't know the cause behind this problem but this is the fix nonetheless:
 
-```
+```shell-session
 meterpreter > ps
 
 Process List

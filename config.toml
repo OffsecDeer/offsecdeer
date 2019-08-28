@@ -3,8 +3,11 @@ title = "Offsec Deer"
 copyright = "Copyright (c) 2019, all rights reserved."
 canonifyurls = true
 languageCode = "en-US"
-paginate = 3
-theme = "hugo-dusk"
+paginate = 6
+theme = "deer"
+
+#pygmentsCodeFences = true
+#pygmentsUseClassic = true
 
 googleAnalytics = ""
 disqusShortname = "offsecdeer"
@@ -13,11 +16,6 @@ disqusShortname = "offsecdeer"
   name = "Giulio Pierantoni"
 
 SectionPagesMenu = "main"
-
-# use Chroma for syntax highlight
-pygmentsStyle = "native" # other dark style options: vim, fruity, monokai
-# enable syntax highlight for code blocks
-pygmentsCodeFences = true
 
 [[menu.main]]
   name = "Home"
@@ -49,9 +47,46 @@ pygmentsCodeFences = true
   url = "/page/contacts"
  weight = 50
 
+[params]
+  description = "Thoughts and notes on offensive security from a hacking enthusiast of a deer"
+  logoimage = "/images/logo.png"
+
 [params.meta]
   keywords = "blog, tech, hacking, pentesting, ctf, htb, hackthebox, offsec"
   description = "Thoughts and notes on offensive security from a hacking enthusiast of a deer"
+
+[params.sidebar]
+    disable = true
+    enable = false
+    ## Specify the order you want sidebar widgets to appear in.
+    ## Omitted widgets are not displayed. You can also specify names
+    ## for your own custom sidebar widgets (see below)
+    #order = [
+        ## Enable a Patreon banner that links to your Patreon page
+        ## See also: https://bluestnight.com/docs/midnight/users/sidebar/patreon-banner/
+        #"patreon",
+        ## Enable a widget with links to multiple methods of support
+        ## See also: https://bluestnight.com/docs/midnight/users/sidebar/support/
+        #"support",
+        ## Enable a search field
+        ## See also: https://bluestnight.com/docs/midnight/users/sidebar/search/
+        #"search",
+        ## Enable a recent articles list. Can be configured to use a custom section
+        ## See also: https://bluestnight.com/docs/midnight/users/sidebar/recent-posts/
+        #"recent",
+        ## Enable a list of page categories
+        ## Will cause errors if no categories are defined
+        #"categories",
+        ## Enable a "cloud" of page tags ordered by most common
+        ## Will cause errors if no tags are defined    
+        #"taglist"
+    #]
+    ## Some sidebar widgets require extra configuration, like the Patreon one.
+    ## If you use the Patreon widget, replace the quoted "username" with your
+    ## Patreon username.
+    #[params.sidebar.patreon]
+        #username = "username"
+
 
 [params.colors]
   # hugo-dusk colors
@@ -64,3 +99,4 @@ pygmentsCodeFences = true
 [taxonomies]
   tag = "tags"
   category = "categories"
+
