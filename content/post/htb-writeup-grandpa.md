@@ -7,6 +7,7 @@ tags:
   - writeup
 showdate: true
 toc: true
+page: false
 ---
 {{%summary%}}
 ![img](/images/grandpa-writeup/1.png)

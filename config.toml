@@ -6,11 +6,8 @@ languageCode = "en-US"
 paginate = 6
 theme = "deer"
 
-#pygmentsCodeFences = true
-#pygmentsUseClassic = true
-
 googleAnalytics = ""
-disqusShortname = "offsecdeer"
+DisqusShortname = "offsecdeer"
 
 [author]
   name = "Giulio Pierantoni"
