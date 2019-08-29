@@ -6,7 +6,7 @@ languageCode = "en-US"
 paginate = 6
 theme = "deer"
 
-googleAnalytics = ""
+googleAnalytics = "UA-146649509-1"
 DisqusShortname = "offsecdeer"
 
 [author]
