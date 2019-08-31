@@ -45,7 +45,7 @@ SectionPagesMenu = "main"
  weight = 50
 
 [params]
-  description = "Thoughts and notes on offensive security from a hacking enthusiast of a deer"
+  description = "Experiments on offensive security, ROM hacking, programming and more from my journey as a white hat hacker"
   logoimage = "/images/logo.png"
 
 [params.meta]
