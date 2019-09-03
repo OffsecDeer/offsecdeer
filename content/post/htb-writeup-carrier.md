@@ -130,6 +130,7 @@ systemctl start quagga
 This script stops the quagga service to restore the original configuration files, including one that clearly has to do with BGP, the Border Gateway Protocol, before starting it again. Let's take a closer look at these two configuration files:
 
 ![img](/images/carrier-writeup/19.png)
+
 ![img](/images/carrier-writeup/20.png)
 
 The most interesting file is of course the first one, where we find the two IP addresses of the two routers I mentioned above. Those two lines tell to add entries to the routing table for the addresses 10.78.10.2 and 10.78.11.2, so we should be able to find them by checking the routing tables with the route command:
