@@ -8,5 +8,5 @@ Take your time to sift through my [posts](/post/) to see if any one picks your i
 
 If you're interested in the theme I use for the site you can find it [here](https://github.com/OffsecDeer/Deer).
 
-Here is a sample of the latest posts I have written:
+If you want to have a discussion on any topic, feel like exchanging ideas, or want to ask me any questions there are a few ways you can reach me, the comments on this website being one of them, otherwise consult my [contacts](/page/contacts).
 
