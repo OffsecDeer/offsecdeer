@@ -1,0 +1,25 @@
+{{ partial "header.html" . }}
+<div class="homepage-content">
+{{ .Content }}
+</div>
+
+<div>
+  {{ range first 6 .Site.RegularPages }}
+     <h2><a href="{{ .Permalink }}">{{ .Title }}</a></h2>
+    <p class="timestamp">{{ .Date.Format "January 2, 2006" }}</p>
+    <div class="content">
+      {{ if isset .Params "description" }}
+        {{ index .Params "description" }}
+      {{ else }}
+        {{ .Summary | plainify | safeHTML }}
+        {{ if .Truncated }}
+            ... <a href="{{ .Permalink }}">Read more &hellip;</a>
+        {{ end }}
+      {{ end }}
+    </div>
+    {{ if .Params.tags }}
+      {{ partial "tags" .Params.tags }}
+    {{ end }}
+  {{ end }}
+</div>
+{{ partial "footer.html" . }}
