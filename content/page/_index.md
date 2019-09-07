@@ -1,4 +1,4 @@
-+++
+<!--+++
 aliases = ["posts","articles","blog","showcase","docs"]
 title = "Posts"
 +++
@@ -28,3 +28,4 @@ title = "Posts"
 {{ end }}
 
 {{ partial "pagination.html" . }}
+-->
