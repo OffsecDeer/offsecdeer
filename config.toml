@@ -45,7 +45,7 @@ SectionPagesMenu = "main"
  weight = 50
 
 [params]
-  description = "Experiments on offensive security, ROM hacking, programming and more from my journey as a white hat hacker"
+  description = "Hacking, programming, exploring. Follow me in my journey in the world of offensive security."
   logoimage = "/images/logo.png"
 
 [params.meta]
@@ -55,34 +55,6 @@ SectionPagesMenu = "main"
 [params.sidebar]
     disable = true
     enable = false
-    ## Specify the order you want sidebar widgets to appear in.
-    ## Omitted widgets are not displayed. You can also specify names
-    ## for your own custom sidebar widgets (see below)
-    #order = [
-        ## Enable a Patreon banner that links to your Patreon page
-        ## See also: https://bluestnight.com/docs/midnight/users/sidebar/patreon-banner/
-        #"patreon",
-        ## Enable a widget with links to multiple methods of support
-        ## See also: https://bluestnight.com/docs/midnight/users/sidebar/support/
-        #"support",
-        ## Enable a search field
-        ## See also: https://bluestnight.com/docs/midnight/users/sidebar/search/
-        #"search",
-        ## Enable a recent articles list. Can be configured to use a custom section
-        ## See also: https://bluestnight.com/docs/midnight/users/sidebar/recent-posts/
-        #"recent",
-        ## Enable a list of page categories
-        ## Will cause errors if no categories are defined
-        #"categories",
-        ## Enable a "cloud" of page tags ordered by most common
-        ## Will cause errors if no tags are defined    
-        #"taglist"
-    #]
-    ## Some sidebar widgets require extra configuration, like the Patreon one.
-    ## If you use the Patreon widget, replace the quoted "username" with your
-    ## Patreon username.
-    #[params.sidebar.patreon]
-        #username = "username"
 
 
 [params.colors]
