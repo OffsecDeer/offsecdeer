@@ -137,7 +137,7 @@ The shellcode was taken [here](http://shell-storm.org/shellcode/files/shellcode-
 
 This is the original ASM code:
 
-```asm
+```assembly
 xor    %eax,%eax
 push   %eax
 push   $0x68732f2f
