@@ -3,6 +3,10 @@ title: "VulnHub Walkthrough: Dawn"
 date: 2019-09-11T19:23:44+02:00
 toc: true
 showdate: true
+tags:
+ - vulnhub
+ - writeup
+ - ctf
 ---
 {{%summary%}}
 ![img](/images/vulnhub-dawn/1.png)
