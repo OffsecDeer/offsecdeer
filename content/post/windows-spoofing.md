@@ -10,8 +10,6 @@ tags:
 
 Here is a little post on a group of techniques I have recently discovered and that I found to be interesting, they're worth their own post because they could become very handy in future Windows audits and the more I learn about Windows exploitation the better!
 
-![img](/images/windows-spoofing/0.png)
-
 ---
 
 ## A little bit of theory
@@ -183,7 +181,7 @@ WARNING: [!] Run Stop-Inveigh to stop
 You probably noticed that all the hashes we received above in both cases come from HTTP. This depends on the way the user tries to interact with the desired request, for instance in both examples above I tried to contact a non-existing machine with the *net use \\name** command.
 A different result can be obtained if the unlucky user was to type the name of the resource either in the Explorer or Run GUI's, like this:
 
-![img](/images/windows-spoofing/4.png)
+![img](/images/windows-spoofing/0.png)
 
 This is what we get back:
 
