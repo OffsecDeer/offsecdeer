@@ -178,7 +178,7 @@ WARNING: [!] Run Stop-Inveigh to stop
 [+] [2019-09-28T21:34:45] HTTP(80) NTLMv2 captured for Giulio-PC\Giulio from 192.168.1.146(WIN-OUU9E92U85U):49226:Giulio::Giulio-PC:1CCFD4B5BC7F01C6:2005C792AF9057E3F7DF66F087B2F671:0101000000000000789EA19DB075D5012AA8E961CF28230000000000000200000800300030000000000000000100000000200000D1D977DB91DDA40D1E5032F276471C836B5CD970F1A76DF292C143
 ```
 
-You probably noticed that all the hashes we received above in both cases come from HTTP. This depends on the way the user tries to interact with the desired request, for instance in both examples above I tried to contact a non-existing machine with the *net use \\name** command.
+You probably noticed that all the hashes we received above in both cases come from HTTP. This depends on the way the user tries to interact with the desired resource, for instance in both examples above I tried to contact a non-existing machine with the *net use \\name** command.
 A different result can be obtained if the unlucky user was to type the name of the resource either in the Explorer or Run GUI's, like this:
 
 ![img](/images/windows-spoofing/0.png)
