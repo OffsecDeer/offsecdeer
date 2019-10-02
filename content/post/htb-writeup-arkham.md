@@ -8,11 +8,10 @@ tags:
 showdate: true
 toc: true
 ---
-{{%summary%}}
-![img](/images/arkham-writeup/1.png)
-{{%/summary%}}
 
 Arkham is one of my favorite boxes on HTB, I personally wouldn't have rated it as Medium but maybe it's just because it's the hardest Windows box I have faced so far, and it proved to be a lot of fun and a good way to learn more about Windows internals and post exploitation. Keep in mind that this is going to be a rather long writeup as I like showing all the steps and the thought process behind them. That being said, let's start from the very beginning: enumeration.
+
+![img](/images/arkham-writeup/1.png)
 
 ---
 

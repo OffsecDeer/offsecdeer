@@ -9,12 +9,11 @@ tags:
  - writeup
 ---
 
-{{%summary%}}
-![img](/images/writeup-access/1.png)
-{{%/summary%}}
-
 Despite this box being rather easy it can teach a couple important lessons to people new to Windows CTF's / hacking: how to open .mdb and .pst files, which can contain very interesting info, and how to look for stored credentials to then use them with the *runas* utility to execute commands as other users, which is exactly how users are supposed to escalate their privileges to Administrator in this box, after logging in via Telnet thanks to the credentials found in an email contained in a .pst file extracted from a password protected .zip archive.
+
 If you have already read one or more of my previous posts you will notice that this is the first box where I used Windows, even if I had originally used Kali to complete the box before it got retired, this was one of my very first boxes and I had very poor note taking practices back then, so I am re-doing all of them from scratch to take proper notes, and due to current technical limitations I am forced to use Windows at the moment, however at least for this challenge there is no difference in the tools or techniques used.
+
+![img](/images/writeup-access/1.png)
 
 ---
 

@@ -8,13 +8,12 @@ tags:
 showdate: true
 toc: true
 ---
-{{%summary%}}
-![img](/images/frolic-writeup/1.png)
-{{%/summary%}}
 
 Despite this box being rated as “Easy” it’s one of those challenges that can easily become frustrating because of rabbit holes, weird messages, and overall not-so-realistic aspects that can be downright confusing, but after all this we get to exploit a very fun and sort of realistic buffer overflow vulnerability through a ret2libc attack that allows us to leverage our permissions and become root on the system, so I’d say it’s a great box to learn new things regarding exploit writing and it can also teach a few tricks that can be used on other CTF-y and less realistic boxes, so all experience is good.
 
 I’m also going to explain some theory regarding the buffer overflow attack we are going to launch, so don’t worry if you never wrote one yourself before, although you might find that part boring if you’re already a good stack smasher.
+
+![img](/images/frolic-writeup/1.png)
 
 ---
 
@@ -242,7 +241,9 @@ If you’re not familiar with buffer overflow vulnerabilities, this happens beca
 
 Local variables are saved in a memory segment called stack, and in the same memory segment, not too many bytes away from our local variables, we also have a 4 bytes long value (on x86 architectures at least) that is supposed to be the memory address the CPU will have to jump to when returning from the current function, so technically it’s the address of the instruction after the call to the function we’re in right now.
 
-I used Python to give our rop binary a string of 100 characters as input, and we received a segmentation error because the string was so long it overwrote the return address of the function on the stack, so when the function returned the CPU tried to access a memory address that looks like this: 0x41414141 (41 is “A” in hexadecimal), an address that the program cannot access, so it exited with an error. Our goal is to overwrite that return address with one that points to some useful instructions, granting us arbitrary code execution. If this sounds confusing and you never programmed in C before I suggest you to study this beautiful language and practice it for some time, it’s essential in order to exploit flaws like this, so from now on I’m going to assume you already understand the basic concept of a simple buffer overflow vulnerability. I also recommend to read a thing or two about [gcc’s x86 calling convention](https://aaronbloomfield.github.io/pdr/book/x86-32bit-ccc-chapter.pdf), it’s what dictates how functions must be called and where the parameters are expected to be in memory, these are all things we must keep in mind while writing a buffer overflow exploit.
+I used Python to give our rop binary a string of 100 characters as input, and we received a segmentation error because the string was so long it overwrote the return address of the function on the stack, so when the function returned the CPU tried to access a memory address that looks like this: 0x41414141 (41 is “A” in hexadecimal), an address that the program cannot access, so it exited with an error.
+
+Our goal is to overwrite that return address with one that points to some useful instructions, granting us arbitrary code execution. If this sounds confusing and you never programmed in C before I suggest you to study this beautiful language and practice it for some time, it’s essential in order to exploit flaws like this, so from now on I’m going to assume you already understand the basic concept of a simple buffer overflow vulnerability. I also recommend to read a thing or two about [gcc’s x86 calling convention](https://aaronbloomfield.github.io/pdr/book/x86-32bit-ccc-chapter.pdf), it’s what dictates how functions must be called and where the parameters are expected to be in memory, these are all things we must keep in mind while writing a buffer overflow exploit.
 
 So we know we have a binary vulnerable to a buffer overflow, which also happens to have the SUID bit set, this is very useful because if we manage to spawn a shell through the buffer overflow that shell will be run as root, and we’ll get to grab the last flag. It’s clear that this is the right path to follow, so it’s time to get our hands dirty. For exploit development on Linux I use GDB + Peda.py, which offers many incredibly useful features for our scope. You can download Peda.py [here](https://github.com/longld/peda). When everything is ready we can load the program and run the “checksec” command to see which security measures are enabled on the binary, we’ll have to consider different approaches based on what we find:
 

@@ -3,12 +3,15 @@ title: "HackTheBox Writeup: Giddy"
 date: 2019-08-30T01:33:19+02:00
 toc: true
 showdate: true
+tags:
+  - hackthebox
+  - writeup
+  - ctf
 ---
-{{%summary%}}
-![img](/images/giddy-writeup/1.png)
-{{%/summary%}}
 
 Giddy was a very nice box, one of those where the path to user is more difficult than escalating privileges, as we'll see. It probably was a little bit easier for me than for some other players because I had already solved Querier some time before touching Giddy, with which it shares the NTLM authentication trigger through xp_dirtree, a very interesting undocumented MSSQL function that allows to list the content of a remote directory, we'll use this to force the database into connecting to our box, thus providing its NTLM hash that we'll crack to login on the system. Root on the other hand is much more straightforward, a local privilege escalation exploit.
+
+![img](/images/giddy-writeup/1.png)
 
 ---
 

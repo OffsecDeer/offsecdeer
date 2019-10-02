@@ -8,11 +8,10 @@ tags:
     - writeup
     - ctf
 ---
-{{%summary%}}
-![img](/images/writeup-bastion/1.png)
-{{%/summary%}}
 
 Bastion proved to be a very easy yet pretty fun challenge, quite unique in its kind even if it doesn't present any particular difficulties, all one needs to complete this box is a search engine to learn how to accomplish certain tasks, all of which only take a couple minutes to solve, hence why so many people finished this box despite it not being one of those two clicks to root kind of boxes (I'm looking at you, Blue, Jerry, Lame, etc...). The first half of the challenge involves finding a Windows backup containing an old copy of the SAM database, which when read gives us SSH credentials to log in the box. Once inside the administrator's password must be extracted from the saved settings of a remote sessions manager.
+
+![img](/images/writeup-bastion/1.png)
 
 ---
 

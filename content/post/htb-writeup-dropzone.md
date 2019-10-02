@@ -3,14 +3,15 @@ title: "HackTheBox Writeup: Dropzone"
 date: 2019-08-31T04:46:29+02:00
 toc: true
 showdate: true
-a: "b"
+tags:
+  - hackthebox
+  - writeup
+  - ctf
 ---
 
-{{%summary%}}
-![img](/images/dropzone-writeup/1.png)
-{{%/summary%}}
-
 As one of my very first difficult boxes on the website Dropzone was relatively easy, more like a medium difficulty box. The difficult part of this challenge is its very little attack surface, which can only be exploited with a technique not many may know about because is no longer useful in modern systems. Once figured out what to do, the whole exploitation phase is trivial. Despite this, Dropzone still taught me a lot because the research that led me to the right solution was very informative and it answered a few questions I always had, in fact I'm going to write a full post on the subject.
+
+![img](/images/dropzone-writeup/1.png)
 
 ---
 

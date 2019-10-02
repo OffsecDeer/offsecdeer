@@ -10,11 +10,10 @@ highlight = "true"
 toc = "true"
 showdate = "true"
 +++
-{{%summary%}}
-![1](/images/arctic-writeup/1.png)
-{{%/summary%}}
 
 Arctic is an easy rated Windows hacking challenge from HackTheBox, here is a writeup/walkthrough to go from boot to root. This box is all about publicly available exploits and known unpatched vulnerabilities.
+
+![1](/images/arctic-writeup/1.png)
 
 ---
 

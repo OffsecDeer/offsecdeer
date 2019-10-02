@@ -8,11 +8,10 @@ tags:
 showdate: true
 toc: true
 ---
-{{%summary%}}
-![img](/images/granny-writeup/1.png)
-{{%/summary%}}
 
 Granny is one of the easiest challenges on HackTheBox, it runs a very old version of Windows and this makes it vulnerable to many exploits, all of which are easy to run. When they were first released Granny and Grandpa were two good boxes to experiment with pivoting, however because of the new system implemented for virtual labs by the HackTheBox team this is no longer possible, as far as I'm aware. So I will only describe the standard steps to take to root the boxes individually, Grandpa will be covered in [the next post](/post/htb-writeup-grandpa/).
+
+![img](/images/granny-writeup/1.png)
 
 ---
 

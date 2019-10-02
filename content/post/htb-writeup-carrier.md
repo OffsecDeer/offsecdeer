@@ -8,11 +8,10 @@ tags:
 toc: true
 showdate: true
 ---
-{{%summary%}}
-![img](/images/carrier-writeup/1.png)
-{{%/summary%}}
 
 When I first tackled Carrier it was the box with the most difficult path to root I had faced, but it's difficult in a very fun and most importantly interesting and educative way, so this box falls straight in my list of favorites, as it allowed me to explore new techniques, tools, and sharpen my enumeration skills. To get user access to the box I found a command injection flaw in the web application, where I logged in with the details found by querying SNMP. Finally, to grab the root flag I performed a BGP hijacking attack to change the routing options of a neighbor network, allowing me to see FTP traffic in that network containing the credentials to the server where the file was hosted.
+
+![img](/images/carrier-writeup/1.png)
 
 ---
 

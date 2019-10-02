@@ -8,11 +8,10 @@ tags:
  - writeup
  - ctf
 ---
-{{%summary%}}
-![img](/images/vulnhub-dawn/1.png)
-{{%/summary%}}
 
 This is a walkthrough (or writuep, whatever term you prefer) of the very first VulnHub box I have rooted: Dawn. You can download it yourself [here](https://www.vulnhub.com/entry/sunset-dawn,341/). It's a box for beginners focused entirely on misconfigurations, the thing I like the most about it are the multiple paths you have to reach the one and only flag, there are apparently five, and I have missed one plus a horizontal privilege escalation path. Definitely something worth coming back to in the future to see if I can 100% this challenge.
+
+![img](/images/vulnhub-dawn/1.png)
 
 ---
 

@@ -8,15 +8,14 @@ tags:
 showdate: true
 toc: true
 ---
-{{%summary%}}
-![img](/images/october-writeup/1.png)
-{{%/summary%}}
 
 October is a Linux box with a difficulty rating from the HTB staff of 4.9 / 10, however the ratings from the members for getting user and root are the total opposites:
 
 ![img](/images/october-writeup/2.png)
 
 The reason behind this is that the box starts fairly easy with normal web enumeration that leads to the discovery of an arbitrary PHP file upload vulnerability which gives us user access to the machine, then, in order to escalate our privileges we'll have to write a buffer overflow exploit to attack a vulnerable SUID binary, the exploit needs to bypass a non-executable stack and ASLR. So this should be fun!
+
+![img](/images/october-writeup/1.png)
 
 ---
 

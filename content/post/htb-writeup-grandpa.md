@@ -9,11 +9,10 @@ showdate: true
 toc: true
 page: false
 ---
-{{%summary%}}
-![img](/images/grandpa-writeup/1.png)
-{{%/summary%}}
 
 Grandpa and its sister box [Granny](/post/htb-writeup-granny/) are unique in the way that they use very old versions of Windows but the approach to follow is still the same for any Windows challenge, and both boxes rely a lot on publicly know vulnerabilities making them easy to own. As I mentioned in Granny's writeup one could own either one of these two boxes and then pivot on to the other one, but this is no longer possible with the current lab system so I won't be talking about that approach, as I never had the chance to try it myself.
+
+![img](/images/grandpa-writeup/1.png)
 
 ---
 

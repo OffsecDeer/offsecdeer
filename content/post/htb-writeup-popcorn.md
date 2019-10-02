@@ -8,11 +8,10 @@ tags:
 showdate: true
 toc: true
 ---
-{{%summary%}}
-![img](/images/popcorn-writeup/1.png)
-{{%/summary%}}
 
 A medium difficulty Linux box, where pretty much all the difficulty comes from the road to user, getting root consists in a very straightforward local privilege escalation exploit, user access is achieved by uploading a PHP shell from an image upload page.
+
+![img](/images/popcorn-writeup/1.png)
 
 ---
 

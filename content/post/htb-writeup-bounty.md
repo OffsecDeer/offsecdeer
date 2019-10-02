@@ -3,12 +3,15 @@ title: "HackTheBox Writeup: Bounty"
 date: 2019-08-31T05:34:26+02:00
 toc: true
 showdate: true
+tags:
+  - hackthebox
+  - ctf
+  - writeup
 ---
-{{%summary%}}
-![img](/images/bounty-writeup/1.png)
-{{%/summary%}}
 
 Bounty requires to gain initial foothold with an interesting method I had never seen before, taking advantage of one of ASP.NET's own features to gain RCE. After that, getting root is very straightforward and multiple local exploits can be used to escalate privileges. It still stands as an interesting Windows box, one of those ideal ones for getting started in the world of Windows hacking.
+
+![img](/images/bounty-writeup/1.png)
 
 ---
 
