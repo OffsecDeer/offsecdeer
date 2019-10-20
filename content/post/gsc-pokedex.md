@@ -100,7 +100,7 @@ How would you tell the game where to look for the data now that it's not in the 
 
 The Assembly routines responsible for calculating the pointer of a Pokèmon's Pokèdex data is at 0x44326 for G/S and 0x44333 for Crystal, here is the latter, heavily commented to make it comprehensible for those not too familiar with ASM:
 
-```aaa
+```gameboy
 #org 44333
 E5			push hl			; save HL on the stack
 21 78 42	ld hl,4378		; load the address of the pokèdex data pointer table into HL
@@ -129,7 +129,7 @@ C9			ret				; return to callee
 
 For Gold and Silver the routine is very similar although not identical:
 
-```aaa
+```gameboy
 #org 44326
 E5			push hl			; save HL on the stack
 21 60 43	ld hl,4360		; load the address of the pokèdex data pointer table into HL
@@ -159,7 +159,7 @@ dataAddress = (bankNumber * 0x4000) + ([reversedPointer] - 0x4000)
 
 Unlike in Crystal, the four ROM banks containing Pokèdex data are one after the other in Gold and Silver, so the developers hardcded the first bank number in the ASM routine and used a simple addition:
 
-```aaa
+```gameboy
 rlca
 rlca
 and a,03
@@ -172,7 +172,7 @@ In Crystal however the pokèdex banks aren't contiguous, so the approach was sli
 
 Followed by the callee of the routine we have just examined:
 
-```aaa
+```gameboy
 #org 44355
 CD 33 43	call $4333		; call the routine above to obtain the address of the pokèdex data
 ```
@@ -181,7 +181,7 @@ I'm not going to show the rest of this function because there are a couple detai
 
 Anyway, I am pointing this out because while reading the code for the first function I noticed that the logical operation effectively hardcodes the number of banks inside which the data is distributed:
 
-```aaa
+```gameboy
 E6 03		and a,03
 ```
 
@@ -199,7 +199,7 @@ You have 934 available free bytes in this bank, it's way more than you need for 
 
 This is not everything you would need to do in order to add a fifth bank of Pokèdex entries, looking at the disassembly I spotted lines like this:
 
-```aaa
+```gameboy
 ld bc, wPokedexDataEnd - wPokedexDataStart
 ```
 
@@ -323,8 +323,6 @@ And with this the post is over. I might make a part two where I actually go into
 If I do end up making more research on this topic you'll see a link pointing to part two, but for now I'll keep focusing on dumping old personal notes and expanding on those.
 
 Thank you for reading this far!
-
-
 
 
 
