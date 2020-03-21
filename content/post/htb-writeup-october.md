@@ -79,10 +79,10 @@ So let's start enumerating a little bit after sending meterpreter a "shell" comm
 
 ![img](/images/october-writeup/16.png)
 
-1. We start a normal shell session, so we don't have to follow meterpreter's weird command structure anymore
-+ We get a semi-interactive shell thanks to Python by spawning a new instance of /bin/bash
-+ One of the very first things I do when I gain access to a Linux box is look for SUID binaries
-+ And in fact we find something very interesting, an executable called "ovrflw", clearing referencing buffer overflows, which is obviously what we are going to need to exploit in order to become root. If we exploit this program and spawn a shell during its execution we will become root, so it's in our best interest to examine this program from up close
+- We start a normal shell session, so we don't have to follow meterpreter's weird command structure anymore
+- We get a semi-interactive shell thanks to Python by spawning a new instance of /bin/bash
+- One of the very first things I do when I gain access to a Linux box is look for SUID binaries
+- And in fact we find something very interesting, an executable called "ovrflw", clearing referencing buffer overflows, which is obviously what we are going to need to exploit in order to become root. If we exploit this program and spawn a shell during its execution we will become root, so it's in our best interest to examine this program from up close
 
 ---
 

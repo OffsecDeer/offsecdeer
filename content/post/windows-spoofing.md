@@ -20,9 +20,9 @@ This protocol is used in Windows networks as a fallback option to DNS: if a user
 
 NBNS (Net-BIOS Name Resolution) is the resolution service Windows uses last, NBNS requests are fired up right after LLMNR's requests without waiting for a response (LLMNR is the evolution of NBNS, NBNS being more limited for example to IPv4 hosts only), so the full order of name resolution protocols used in Windows by default is this:
 
-1. DNS
-+ LLMNR
-+ NBNS
+- DNS
+- LLMNR
+- NBNS
 
 Because LLMNR and NBNS requests are multicasted they will be sent out to all the client's neighbors, multicast means data is sent out to a group of different devices, LLMNR requests have a static multicast destination address of 224.0.0.252 for IPv4 and ff02::1:3 for IPv6.
 
@@ -404,12 +404,12 @@ For WPAD spoofing the simplest solution is obviously adding an entry in the DNS 
 
 **References:**
 
-1. [Blog.Netspi: Exploiting ADIDNS](https://blog.netspi.com/exploiting-adidns/)
-+ [Pentest.Blog: What are LLMNR and WPAD and how to abuse them during pentests](https://pentest.blog/what-is-llmnr-wpad-and-how-to-abuse-them-during-pentest/)
-+ [Wireshark Wiki: NBNS](https://wiki.wireshark.org/NetBIOS/NBNS)
-+ [Wikipedia: LLMNR](https://en.wikipedia.org/wiki/Link-Local_Multicast_Name_Resolution)
-+ [GitHub: Responder](https://github.com/SpiderLabs/Responder)
-+ [GitHub: Inveigh Wiki](https://github.com/Kevin-Robertson/Inveigh/wiki)
+- [Blog.Netspi: Exploiting ADIDNS](https://blog.netspi.com/exploiting-adidns/)
+- [Pentest.Blog: What are LLMNR and WPAD and how to abuse them during pentests](https://pentest.blog/what-is-llmnr-wpad-and-how-to-abuse-them-during-pentest/)
+- [Wireshark Wiki: NBNS](https://wiki.wireshark.org/NetBIOS/NBNS)
+- [Wikipedia: LLMNR](https://en.wikipedia.org/wiki/Link-Local_Multicast_Name_Resolution)
+- [GitHub: Responder](https://github.com/SpiderLabs/Responder)
+- [GitHub: Inveigh Wiki](https://github.com/Kevin-Robertson/Inveigh/wiki)
 
 
 

@@ -1,6 +1,6 @@
 baseurl = "https://offsecdeer.gitlab.io/"
 title = "Offsec Deer"
-copyright = "Copyright (c) 2019, all rights reserved."
+copyright = "Copyright (c) 2020, all rights reserved."
 canonifyurls = true
 languageCode = "en-US"
 paginate = 6
@@ -45,7 +45,7 @@ SectionPagesMenu = "main"
  weight = 50
 
 [params]
-  description = "Hacking, programming, exploring. Follow me in my journey in the world of offensive security."
+  description = "Hacking and offensive security notes from a cybersecurity deer"
   logoimage = "/images/logo.png"
 
 [params.meta]

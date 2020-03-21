@@ -168,18 +168,18 @@ The first command let me enter in configure mode, the second defines a list of p
 
 ![img](/images/carrier-writeup/27.png)
 
-1. Enter the configuration mode
-+ Add a new list of prefixes called "baudy", which contains the range of our interest
-+ We use the "route-map" command to set a new entry in the routing tables that involve routing to AS200, with priority of 10, so the first check
-+ We want to set a condition for the requests coming from IPs that are part of our list
-+ The condition we add is to not advertise our new route to anyone else (AS300), or else we won't be able to receive the traffic correctly
-+ A second check for the same block (AS200) for every other IP address is to just allow everything without adding any other setting
-+ Now we switch to the other neighbor and tell that we do not want it to advertise our new route, it only has to do with AS200
-+ We check if a packet directed to AS300 is part of our range
-+ Otherwise permit
-+ Now we change context to our own router: AS100
-+ We add a new network to advertise, including base address and subnet mask, which is equal to saying 10.120.15.0/25
-+ Quit the configuration mode
+- Enter the configuration mode
+- Add a new list of prefixes called "baudy", which contains the range of our interest
+- We use the "route-map" command to set a new entry in the routing tables that involve routing to AS200, with priority of 10, so the first check
+- We want to set a condition for the requests coming from IPs that are part of our list
+- The condition we add is to not advertise our new route to anyone else (AS300), or else we won't be able to receive the traffic correctly
+- A second check for the same block (AS200) for every other IP address is to just allow everything without adding any other setting
+- Now we switch to the other neighbor and tell that we do not want it to advertise our new route, it only has to do with AS200
+- We check if a packet directed to AS300 is part of our range
+- Otherwise permit
+- Now we change context to our own router: AS100
+- We add a new network to advertise, including base address and subnet mask, which is equal to saying 10.120.15.0/25
+- Quit the configuration mode
 
 Once we have completed these steps we have to clear our current routes and re-adveirtse them from scratch, we do that with this command while still in the vtysh console:
 

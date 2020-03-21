@@ -258,9 +258,9 @@ in order to grow.[0x50]
 
 This is the only part that is going to be a little confusing, the way height and weight are stored isn't the most intuitive. Here's how to retrieve the original values from the 16 bits values taken from the ROM:
 
-1. Flip the two bytes (the GameBoy's CPU follows the little endian standard)
-+ Convert the 16 bits value to base 10 as a whole
-+ If calculating height, count the last two digits as decimal. If calculating weight, count only the very last
+- Flip the two bytes (the GameBoy's CPU follows the little endian standard)
+- Convert the 16 bits value to base 10 as a whole
+- If calculating height, count the last two digits as decimal. If calculating weight, count only the very last
 
 Let's try to get Onix's height back:
 

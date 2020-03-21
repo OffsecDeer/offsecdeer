@@ -96,11 +96,11 @@ Looking this up on Google immediately reveals a [local privilege escalation expl
 ![img](/images/popcorn-writeup/19.png)
 
 
-1. Change directory to /tmp/ to have write permissions
-+ Download the exploit from our box
-+ Add execute permissions to the exploit
-+ Run
-+ Profit
+- Change directory to /tmp/ to have write permissions
+- Download the exploit from our box
+- Add execute permissions to the exploit
+- Run
+- Profit
 
 
 

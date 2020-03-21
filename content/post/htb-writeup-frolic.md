@@ -376,11 +376,11 @@ Let’s upload this sexy exploit to the box after removing the comments from the
 
 And the system got owned! A quick summary of these last few actions I performed:
 
-1. I changed directory to /tmp in order to have write permissions in the working directory, then uploaded the exploit
-+ I started a shell session from the meterpreter command line
-+ Because the obtained shell isn’t interactive I spawned a semi-interactive one through a Python one-liner
-+ I run the program in Ayush’s home folder
-+ Rooted!
+- I changed directory to /tmp in order to have write permissions in the working directory, then uploaded the exploit
+- I started a shell session from the meterpreter command line
+- Because the obtained shell isn’t interactive I spawned a semi-interactive one through a Python one-liner
+- I run the program in Ayush’s home folder
+- Rooted!
 
 I thought this was a really fun box, especially the privilege escalation part because I love software exploitation and I wish there were more boxes on HTB that required it. Although maybe I would have given 30 points for this, not just 20. I hope you enjoyed this writeup.
 
