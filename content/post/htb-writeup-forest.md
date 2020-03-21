@@ -21,7 +21,7 @@ Warning: this writeup might be a little messy because I forgot to organize my no
 
 ## Enumeration
 
-From an initial nmap scan we can tell the host is an Active Directory domain controller judging from the services available, like DNS (53), Kerberos (88), SMB (445), and LDAP (389):
+From an initial nmap scan we can tell the host is an Active Directory domain controller judging from the services available, like DNS (53), Kerberos (88), SMB (445), LDAP (389), and several RPC programs running in the highest ports:
 
 ```aaa
 ┌─[baud@parrot]─[~/HTB/forest]
@@ -36,18 +36,35 @@ PORT     STATE SERVICE      VERSION
 |   DNSVersionBindReqTCP: 
 |     version
 |_    bind
-88/tcp   open  kerberos-sec Microsoft Windows Kerberos (server time: 2019-12-04 20:17:28Z)
-135/tcp  open  msrpc        Microsoft Windows RPC
-139/tcp  open  netbios-ssn  Microsoft Windows netbios-ssn
-389/tcp  open  ldap         Microsoft Windows Active Directory LDAP (Domain: htb.local, Site: Default-First-Site-Name)
-445/tcp  open  microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds (workgroup: HTB)
-464/tcp  open  kpasswd5?
-593/tcp  open  ncacn_http   Microsoft Windows RPC over HTTP 1.0
-636/tcp  open  tcpwrapped
-3268/tcp open  ldap         Microsoft Windows Active Directory LDAP (Domain: htb.local, Site: Default-First-Site-Name)
-3269/tcp open  tcpwrapped
+88/tcp    open  kerberos-sec Microsoft Windows Kerberos (server time: 2020-03-21 00:28:08Z)
+135/tcp   open  msrpc        Microsoft Windows RPC
+139/tcp   open  netbios-ssn  Microsoft Windows netbios-ssn
+389/tcp   open  ldap         Microsoft Windows Active Directory LDAP (Domain: htb.local, Site: Default-First-Site-Name)
+445/tcp   open  microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds (workgroup: HTB)
+464/tcp   open  kpasswd5?
+593/tcp   open  ncacn_http   Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  tcpwrapped
+3268/tcp  open  ldap         Microsoft Windows Active Directory LDAP (Domain: htb.local, Site: Default-First-Site-Name)
+3269/tcp  open  tcpwrapped
+5985/tcp  open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+9389/tcp  open  mc-nmf       .NET Message Framing
+47001/tcp open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+49664/tcp open  msrpc        Microsoft Windows RPC
+49665/tcp open  msrpc        Microsoft Windows RPC
+49666/tcp open  msrpc        Microsoft Windows RPC
+49667/tcp open  msrpc        Microsoft Windows RPC
+49671/tcp open  msrpc        Microsoft Windows RPC
+49676/tcp open  ncacn_http   Microsoft Windows RPC over HTTP 1.0
+49677/tcp open  msrpc        Microsoft Windows RPC
+49684/tcp open  msrpc        Microsoft Windows RPC
+49706/tcp open  msrpc        Microsoft Windows RPC
+49900/tcp open  msrpc        Microsoft Windows RPC
 1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
-SF-Port53-TCP:V=7.80%I=7%D=12/4%Time=5DE81299%P=x86_64-pc-linux-gnu%r(DNSV
+SF-Port53-TCP:V=7.80%I=7%D=3/21%Time=5E755C99%P=x86_64-pc-linux-gnu%r(DNSV
 SF:ersionBindReqTCP,20,"\0\x1e\0\x06\x81\x04\0\x01\0\0\0\0\0\0\x07version\
 SF:x04bind\0\0\x10\0\x03");
 Service Info: Host: FOREST; OS: Windows; CPE: cpe:/o:microsoft:windows
@@ -307,7 +324,7 @@ Pass: s3rvice
 
 
 
-[evil-winrm](https://github.com/Hackplayers/evil-winrm) can be used to login through WinRM, which is running on port 5985 and that nmap usually recognizes as RPC via HTTP:
+[evil-winrm](https://github.com/Hackplayers/evil-winrm) can be used to login through WinRM, which is running on port 5985 and that nmap usually recognizes as "Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)":
 
 ```aaa
 ┌─[✗]─[baud@parrot]─[~/HTB/forest]
