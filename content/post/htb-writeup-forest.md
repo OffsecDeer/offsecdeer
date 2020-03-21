@@ -26,10 +26,10 @@ From an initial nmap scan we can tell the host is an Active Directory domain con
 ```aaa
 ┌─[baud@parrot]─[~/HTB/forest]
 └──╼ $cat nmap.nmap
-# Nmap 7.80 scan initiated Wed Dec  4 21:09:36 2019 as: nmap -sC -sV -oA nmap 10.10.10.161
+# Nmap 7.80 scan initiated Wed Dec  4 21:09:36 2019 as: nmap -sC -sV -oA nmap -p- -T4 10.10.10.161
 Nmap scan report for 10.10.10.161
 Host is up (0.16s latency).
-Not shown: 989 closed ports
+Not shown: 65511 closed ports
 PORT     STATE SERVICE      VERSION
 53/tcp   open  domain?
 | fingerprint-strings: 
