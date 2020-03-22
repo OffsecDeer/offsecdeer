@@ -481,7 +481,9 @@ There are a few currently unpathced UAC bypasses for Windows 10, I tried these t
 - https://egre55.github.io/system-properties-uac-bypass/
 - https://0x00-0x00.github.io/research/2018/10/31/How-to-bypass-UAC-in-newer-Windows-versions.html
 
-And I'm going to demonstrate egre55's method because in my opinion it's more fun, even if a little longer. This method abuses the fact that some executables can bypass the UAC prompt thanks to a property found inside the executable's manifest: "<autoElevate>true". This allows certain programs to be granted administrator privileges without a UAC prompt. Egre55 found that some of the programs with this property are vulnerable to DLL hijacking and crafting a malicious DLL allows us to execute arbitrary code bypassing UAC. These are the vulnerable programs:
+And I'm going to demonstrate egre55's method because in my opinion it's more fun, even if a little longer. This method abuses the fact that some executables can bypass the UAC prompt thanks to a property found inside the executable's manifest: "autoElevate". If set to "true" this property allows a program to be granted administrator privileges without a UAC prompt.
+
+Egre55 found that some of the programs with this property are vulnerable to DLL hijacking and crafting a malicious DLL allows us to execute arbitrary code bypassing UAC. These are the vulnerable programs:
 
 ```shell-session
 C:\Windows\SysWOW64\SystemPropertiesAdvanced.exe
