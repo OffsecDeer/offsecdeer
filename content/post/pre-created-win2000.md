@@ -24,7 +24,9 @@ Pre-creating a computer means adding a computer object to AD without using it to
 
 ![f60e13fb0ea62f863411269fcf7c5255.png](/_resources/f60e13fb0ea62f863411269fcf7c5255.png)
 
-Resetting a computer on the other hand breaks its connection to the domain: the computer account will still exist but it won't be tied to the host that used it anymore, so that host can't log into the domain anymore until it joins it again. A computer reset can be done either from ADUC or PowerShell.![5df84374967823a54ed9efab65fb036b.png](../_resources/5df84374967823a54ed9efab65fb036b.png)
+Resetting a computer on the other hand breaks its connection to the domain: the computer account will still exist but it won't be tied to the host that used it anymore, so that host can't log into the domain anymore until it joins it again. A computer reset can be done either from ADUC or PowerShell.
+
+![5df84374967823a54ed9efab65fb036b.png](/_resources/5df84374967823a54ed9efab65fb036b.png)
 
 In both cases the machine account's password is set to the lowercase name of the computer itself, minus the $ character. In the image above I created a TEST2 computer with pre-Windows 2000 compatibility, which means its password will be "test2". I have also created a TEST1 computer but without pre-Windows 2000 compatibility, then I used CME to try logging in to both using their lowercase name as password:
 
