@@ -21,7 +21,7 @@ SectionPagesMenu = "main"
   weight = 10
 
 [[menu.main]]
-  name = "Posts"
+  name = "All Articles"
   identifier = "post"
   url = "/post/"
   weight = 20
