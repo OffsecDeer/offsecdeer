@@ -2,6 +2,7 @@
 title: "Structure And Hacking Of The Pokèdex In Pokèmon Gold, Silver, Crystal"
 date: 2019-10-20T00:00:51+02:00
 showdate: true
+toc: true
 tags:
   - rom-hacking
   - gameboy

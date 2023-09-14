@@ -45,7 +45,7 @@ SectionPagesMenu = "main"
  weight = 50
 
 [params]
-  description = "Hacking (mostly) Windows and Active Directory for fun and profit"
+  description = "Hacking Windows and Active Directory for fun and profit"
   logoimage = "/images/logo.png"
 
 [params.meta]
