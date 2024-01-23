@@ -6,7 +6,7 @@ tags:
   - windows
 toc: true
 showdate: true
-draft:true
+draft: true
 ---
 
 Another day, another Active Directory feature to put under the microscope. This time it's Group Managed Service Accounts, which I briefly mentioned in my post about [confidential attributes](/post/confidential-attributes/). I'll exaplain what gMSAs are, how to configure them in a test lab, and what kinds of attacks are possible on these accounts.
